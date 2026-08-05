@@ -53,7 +53,7 @@ const Header = () => {
 
                     <Link
                         href="/signup"
-                        className="btn btn-outline rounded-xl"
+                        className="btn bg-transparent text-muted-foreground rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
                     >
                         Sign up
                     </Link>

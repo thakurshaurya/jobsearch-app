@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { motion } from "motion/react";
 import { FaArrowRight } from "react-icons/fa";
 
@@ -39,14 +39,18 @@ const InitialTxt = () => {
           transition={{ delay: 0.45, duration: 0.6 }}
           className="mt-12 flex justify-center gap-5"
         >
-          <button className="btn btn-primary px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
-            Get Started
-            <FaArrowRight />
-          </button>
+          <Link href="#upload">
+            <button className="btn btn-primary px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
+              Get Started
+              <FaArrowRight />
+            </button>
+          </Link>
 
-          <button className="btn btn-outline px-8 py-6 rounded-xl text-lg">
-            Learn More
-          </button>
+          <Link href="#features">
+            <button className="btn bg-transparent text-muted-foreground px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
+              Learn More
+            </button>
+          </Link>
         </motion.div>
       </div>
     </section>
