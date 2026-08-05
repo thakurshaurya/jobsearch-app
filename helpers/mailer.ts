@@ -42,7 +42,7 @@ export const sendMail = async ({
 
         const mailResponse = await transport.sendMail({
             from: {
-                address: "hello@demomailtrap.co",
+                address: "thakurshaurya2007@gmail.com",
                 name: "JobSearch AI",
             },
             to: email,
