@@ -9,7 +9,7 @@ const InitialTxt = () => {
       <div className="max-w-6xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
           <h1 className="hero-gradient text-5xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tight">
@@ -24,7 +24,7 @@ const InitialTxt = () => {
 
         <motion.p
           initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.6 }}
           className="mt-8 mx-auto max-w-3xl text-lg md:text-xl text-muted-foreground leading-8"
         >
@@ -35,11 +35,11 @@ const InitialTxt = () => {
 
         <motion.div
           initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.6 }}
           className="mt-12 flex justify-center gap-5"
         >
-          <Link href="#upload">
+          <Link href="/upload">
             <button className="btn btn-primary px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
               Get Started
               <FaArrowRight />

@@ -3,7 +3,7 @@ import Initialtxt from "./MainComponents/Initialtxt"
 const Main = () => {
   return (
     <div className="min-h-screen  ">
-      <section id="#/">
+      <section id="/">
         <Initialtxt />
       </section>
       <section id="features">

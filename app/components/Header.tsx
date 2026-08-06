@@ -32,7 +32,7 @@ const Header = () => {
                     </Link>
 
                     <Link
-                        href="/resume"
+                        href="/upload"
                         className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
                         Resume

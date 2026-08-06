@@ -12,7 +12,7 @@ function Features() {
         <motion.div
           initial={{ opacity: 0, x: -80 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{
             duration: 0.5,
             ease: "easeOut",
@@ -44,7 +44,7 @@ function Features() {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           whileHover={{ y: -8 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{
             duration: 0.5,
           }}
@@ -68,7 +68,7 @@ function Features() {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           whileHover={{ y: -8 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{
             duration: 0.5,
           }}
@@ -86,14 +86,14 @@ function Features() {
         <motion.div
           initial={{ opacity: 0, x: 80 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{
             duration: 0.5,
             ease: "easeOut",
           }}
           className="w-1/2 max-w-xl"
         >
-          <span className="rounded-full bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-500">
+          <span className="rounded-full bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-500">
             Step 2
           </span>
 
