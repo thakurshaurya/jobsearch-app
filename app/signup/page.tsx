@@ -1,14 +1,54 @@
 "use client";
 
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import { motion } from "motion/react";
 import { User, Mail, Lock } from "lucide-react";
+import { useState } from "react";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const username = formData.get("username");
+      const email = formData.get("email");
+      const password = formData.get("password");
+
+      const response = await fetch("/api/users/signup", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({username, email, password})
+      });
+
+      const data = await response.json();
+
+      if (response.status === 201) {
+        router.push("/login");
+      } else {
+        setError(data.error || "Error creating account");
+      }
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-10">
 
       <motion.form
+        onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{
@@ -62,6 +102,8 @@ export default function SignupPage() {
 
                 <input
                   type="text"
+                  id="username"
+                  name="username"
                   placeholder="Enter Username"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
                 />
@@ -81,6 +123,8 @@ export default function SignupPage() {
 
                 <input
                   type="email"
+                  id="email"
+                  name="email"
                   placeholder="example@email.com"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
                 />
@@ -100,22 +144,33 @@ export default function SignupPage() {
 
                 <input
                   type="password"
+                  id="password"
+                  name="password"
                   placeholder="••••••••"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
                 />
 
               </div>
             </div>
+
+            {error && (
+              <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500 border border-red-500/20">
+                {error}
+              </div>
+            )}
+
             <motion.button
+              type="submit"
+              disabled={loading}
               whileHover={{
                 scale: 1.03,
               }}
               whileTap={{
                 scale: 0.97,
               }}
-              className="mt-3 w-full rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all"
+              className="mt-3 w-full rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </motion.button>
 
 

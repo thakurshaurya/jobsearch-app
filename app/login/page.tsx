@@ -3,12 +3,33 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Mail, Lock } from "lucide-react";
+import { useState } from "react";
+import { loginUser } from "@/app/action";
 
 export default function LoginPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    // on success the action redirects to "/" and never returns
+    const result = await loginUser(email, password);
+
+    setError(result?.error || "Login failed");
+    setLoading(false);
+  }
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-10">
 
       <motion.form
+        onSubmit = {handleSubmit}
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{
@@ -62,8 +83,10 @@ export default function LoginPage() {
 
                 <input
                   type="email"
+                  name="email"
                   placeholder="example@email.com"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
+                  required
                 />
 
               </div>
@@ -81,8 +104,10 @@ export default function LoginPage() {
 
                 <input
                   type="password"
+                  name="password"
                   placeholder="••••••••"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
+                  required
                 />
 
               </div>
@@ -98,17 +123,24 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {error && (
+              <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500 border border-red-500/20">
+                {error}
+              </div>
+            )}
 
             <motion.button
+              type="submit"
+              disabled={loading}
               whileHover={{
                 scale: 1.03,
               }}
               whileTap={{
                 scale: 0.97,
               }}
-              className="mt-3 w-full rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all"
+              className="mt-3 w-full rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </motion.button>
 
 
