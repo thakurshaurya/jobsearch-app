@@ -14,7 +14,7 @@ function Features() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: false }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
             ease: "easeOut",
           }}
           className="w-1/2 max-w-xl"
@@ -46,7 +46,7 @@ function Features() {
           whileHover={{ y: -8 }}
           viewport={{ once: false }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
           }}
           className="flex justify-center"
         >
@@ -70,7 +70,7 @@ function Features() {
           whileHover={{ y: -8 }}
           viewport={{ once: false }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
           }}
           className="flex justify-center"
         >
@@ -88,7 +88,7 @@ function Features() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: false }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
             ease: "easeOut",
           }}
           className="w-1/2 max-w-xl"

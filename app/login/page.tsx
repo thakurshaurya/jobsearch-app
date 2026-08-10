@@ -19,7 +19,6 @@ export default function LoginPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    // on success the action redirects to "/" and never returns
     const result = await loginUser(email, password);
 
     setError(result?.error || "Login failed");
@@ -33,8 +32,8 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{
-          duration: 0.6,
-          ease: "easeOut",
+          duration: 0.2,
+          ease: "easeIn",
         }}
         className="relative z-10 w-full max-w-md"
       >

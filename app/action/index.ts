@@ -47,11 +47,9 @@ export async function loginUser(email: string, password: string) {
     return { error: error.message };
   }
 
-  // refresh the root layout so Header re-renders with the new cookie
   revalidatePath("/", "layout");
 
-  // must be outside try/catch - redirect() throws a control-flow exception
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function logoutUser() {
