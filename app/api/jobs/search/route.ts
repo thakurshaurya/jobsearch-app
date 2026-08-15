@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    // Helpful while developing
     console.log("JSearch response:", data);
 
     if (!response.ok) {
@@ -87,18 +86,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    /*
-      JSearch can return jobs in different shapes.
-
-      Shape 1:
-      data: [ ...jobs ]
-
-      Shape 2:
-      data: {
-        jobs: [ ...jobs ]
-      }
-    */
-
     let rawJobs: any[] = [];
 
     if (Array.isArray(data?.data)) {
@@ -109,44 +96,26 @@ export async function GET(request: NextRequest) {
 
     console.log("Number of jobs:", rawJobs.length);
 
-    /*
-      Convert JSearch jobs into our own format.
-    */
-
     const jobs = rawJobs.map((job: any) => ({
       id: job.job_id,
-
       title: job.job_title,
-
       company: job.employer_name,
-
       companyLogo: job.employer_logo ?? null,
-
       location: job.job_location,
-
-      postedDate:
-        job.job_posted_at ?? null,
-
+      postedDate: job.job_posted_at ?? null,
       salary:
         job.job_min_salary != null
           ? `${job.job_min_salary} - ${
               job.job_max_salary ?? ""
             } ${job.job_salary_currency ?? ""}`
           : null,
-
       applyUrl:
         job.job_apply_link ??
         job.job_google_link ??
         null,
-
-      description:
-        job.job_description ?? "",
-
-      employmentType:
-        job.job_employment_type ?? null,
-
-      remote:
-        job.job_is_remote ?? false,
+      description: job.job_description ?? "",
+      employmentType: job.job_employment_type ?? null,
+      remote: job.job_is_remote ?? false,
     }));
 
     return NextResponse.json({

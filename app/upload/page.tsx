@@ -29,30 +29,26 @@ import {
 } from "@/app/action";
 import { DEVICON_SKILLS, getSkillIcon } from "@/lib/devicons";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export default function UploadPage() {
   const router = useRouter();
 
-  // Navigation & initial check state
   const [step, setStep] = useState<1 | 2>(1);
   const [initialChecking, setInitialChecking] = useState(true);
 
-  // Step 1 state
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [fileError, setFileError] = useState<string>("");
   const [aboutSelf, setAboutSelf] = useState<string>("");
 
-  // Step 2 state
   const [targetRole, setTargetRole] = useState<string>("");
   const [targetSkills, setTargetSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState<string>("");
   const [targetSalaryMin, setTargetSalaryMin] = useState<string>("");
   const [targetSalaryMax, setTargetSalaryMax] = useState<string>("");
 
-  // Generic status states
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
@@ -60,7 +56,6 @@ export default function UploadPage() {
     null
   );
 
-  // Check if profile is already set up on mount or if user requested reset
   useEffect(() => {
     async function checkExistingProfile() {
       try {
@@ -107,7 +102,6 @@ export default function UploadPage() {
     }
   };
 
-  // Dropzone file handler
   const handleFileDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setFileError("");
     setError("");
@@ -134,7 +128,6 @@ export default function UploadPage() {
       setIsUploading(true);
       setUploadProgress(10);
 
-      // Simulate realistic upload progress bar
       let currentProgress = 10;
       const interval = setInterval(() => {
         currentProgress += Math.floor(Math.random() * 25) + 15;
@@ -168,7 +161,6 @@ export default function UploadPage() {
     setFileError("");
   };
 
-  // Extract experience and education snippets from aboutSelf text
   const extractExperienceAndEducation = (text: string) => {
     if (!text.trim()) return { experience: null, education: null };
 
@@ -189,7 +181,6 @@ export default function UploadPage() {
     };
   };
 
-  // Step 1 submit handler
   const handleStep1Submit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError("");
@@ -252,7 +243,6 @@ export default function UploadPage() {
     }
   };
 
-  // Skill management for Step 2
   const handleAddSkill = (skillToAdd: string) => {
     const trimmed = skillToAdd.trim();
     if (!trimmed) return;
@@ -281,7 +271,6 @@ export default function UploadPage() {
     }
   };
 
-  // Step 2 submit handler
   const handleStep2Submit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError("");
@@ -323,7 +312,6 @@ export default function UploadPage() {
     }
   };
 
-  // Format currency display
   const formatRupee = (val: string) => {
     const num = parseFloat(val);
     if (isNaN(num)) return "";
@@ -347,7 +335,6 @@ export default function UploadPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 sm:px-6">
-      {/* Background Decorative Glow */}
       <div className="pointer-events-none absolute -top-40 -left-40 h-96 w-96 rounded-full bg-sky-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
 
@@ -358,7 +345,6 @@ export default function UploadPage() {
         className="relative z-10 w-full max-w-2xl"
       >
         <section className="rounded-3xl border border-border bg-card/80 p-6 shadow-2xl backdrop-blur-xl sm:p-10">
-          {/* Mac window dots header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-red-400" />
@@ -382,7 +368,6 @@ export default function UploadPage() {
             </div>
           </div>
 
-          {/* Progress Bar */}
           <div className="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
             <motion.div
               className="h-full bg-gradient-to-r from-sky-500 to-cyan-400"
@@ -392,7 +377,6 @@ export default function UploadPage() {
             />
           </div>
 
-          {/* Header Title */}
           <div className="mt-6 text-center">
             <h1 className="hero-gradient text-3xl font-extrabold sm:text-4xl">
               {step === 1 ? "Setup Your Profile" : "Job Preferences"}
@@ -404,7 +388,6 @@ export default function UploadPage() {
             </p>
           </div>
 
-          {/* Alert Messages */}
           <AnimatePresence mode="wait">
             {error && (
               <motion.div
@@ -447,7 +430,6 @@ export default function UploadPage() {
             )}
           </AnimatePresence>
 
-          {/* STEP 1 FORM */}
           {step === 1 && (
             <motion.form
               initial={{ opacity: 0, x: -20 }}
@@ -456,7 +438,6 @@ export default function UploadPage() {
               onSubmit={handleStep1Submit}
               className="mt-8 space-y-8"
             >
-              {/* Section 1: Resume Upload */}
               <div className="space-y-3">
                 <label className="flex items-center justify-between text-sm font-semibold text-foreground">
                   <span className="flex items-center gap-2">
@@ -520,7 +501,6 @@ export default function UploadPage() {
                       </button>
                     </div>
 
-                    {/* Upload progress state */}
                     {isUploading ? (
                       <div className="mt-4 space-y-1.5">
                         <div className="flex justify-between text-xs text-sky-400 font-medium">
@@ -544,7 +524,6 @@ export default function UploadPage() {
                 )}
               </div>
 
-              {/* Section 2: Self Description */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -603,7 +582,6 @@ export default function UploadPage() {
             </motion.form>
           )}
 
-          {/* STEP 2 FORM */}
           {step === 2 && (
             <motion.form
               initial={{ opacity: 0, x: 20 }}
@@ -612,7 +590,6 @@ export default function UploadPage() {
               onSubmit={handleStep2Submit}
               className="mt-8 space-y-6"
             >
-              {/* Field 1: Target Role */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Briefcase className="h-4 w-4 text-sky-400" />
@@ -628,7 +605,6 @@ export default function UploadPage() {
                 />
               </div>
 
-              {/* Field 2: Target Skills */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Code className="h-4 w-4 text-cyan-400" />
@@ -636,7 +612,6 @@ export default function UploadPage() {
                   <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
                 </label>
 
-                {/* Selected Skills Tags */}
                 {targetSkills.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-1">
                     {targetSkills.map((skill) => {
@@ -661,7 +636,6 @@ export default function UploadPage() {
                   </div>
                 )}
 
-                {/* Input with Add button */}
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
@@ -681,7 +655,6 @@ export default function UploadPage() {
                   </button>
                 </div>
 
-                {/* Searchable Devicon Suggestions (At most 7 shown) */}
                 <div>
                   <p className="mb-2 text-xs font-medium text-muted-foreground flex items-center justify-between">
                     <span>
@@ -722,7 +695,6 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              {/* Field 3: Salary Range */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <IndianRupee className="h-4 w-4 text-emerald-400" />

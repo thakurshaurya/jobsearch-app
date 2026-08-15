@@ -74,13 +74,11 @@ export async function saveUserResume(
   try {
     await connectDB();
 
-    // 1. Authenticate using getCurrentUser()
     const currentUser = await getCurrentUser();
     if (!currentUser || !currentUser.userId) {
       return { error: "Not authenticated" };
     }
 
-    // 2. Validate: either resumeUrl OR aboutSelf must be provided
     const hasResumeUrl = Boolean(resumeUrl && resumeUrl.trim());
     const hasAboutSelf = Boolean(aboutSelf && aboutSelf.trim());
 
@@ -88,7 +86,6 @@ export async function saveUserResume(
       return { error: "Either resumeUrl or aboutSelf must be provided" };
     }
 
-    // 3. Determine sourceType based on provided fields
     const computedSourceType: "resume" | "about_self" | "both" =
       hasResumeUrl && hasAboutSelf
         ? "both"
@@ -98,11 +95,9 @@ export async function saveUserResume(
 
     const finalSourceType = sourceType || computedSourceType;
 
-    // 4. Check if Resume profile already exists for this user
     let resumeDoc = await Resume.findOne({ userId: currentUser.userId });
 
     if (resumeDoc) {
-      // 5. Update existing document
       if (resumeUrl !== undefined) resumeDoc.resumeUrl = resumeUrl;
       if (aboutSelf !== undefined) resumeDoc.aboutSelf = aboutSelf;
       if (parsedSkills !== undefined) {
@@ -113,7 +108,6 @@ export async function saveUserResume(
       resumeDoc.sourceType = finalSourceType;
       resumeDoc.lastUpdated = new Date();
     } else {
-      // 6. Create new Resume document
       resumeDoc = new Resume({
         userId: currentUser.userId,
         resumeUrl: resumeUrl || null,
@@ -126,12 +120,10 @@ export async function saveUserResume(
       });
     }
 
-    // 7. Save to database
     const savedResume = await resumeDoc.save();
 
     revalidatePath("/profile");
 
-    // 8. Return serializable object
     return {
       success: true,
       resume: JSON.parse(JSON.stringify(savedResume)),
@@ -151,22 +143,18 @@ export async function saveJobTarget(
   try {
     await connectDB();
 
-    // 1. Authenticate using getCurrentUser()
     const currentUser = await getCurrentUser();
     if (!currentUser || !currentUser.userId) {
       return { error: "Not authenticated" };
     }
 
-    // 2. Validate: targetRole is required and not empty
     if (!targetRole || !targetRole.trim()) {
       return { error: "targetRole is required" };
     }
 
-    // 3. Check if JobTarget profile already exists for this user
     let targetDoc = await JobTarget.findOne({ userId: currentUser.userId });
 
     if (targetDoc) {
-      // 4. Update existing document
       targetDoc.targetRole = targetRole.trim();
       if (targetSkills !== undefined) targetDoc.targetSkills = targetSkills;
       if (targetSalaryMin !== undefined)
@@ -174,7 +162,6 @@ export async function saveJobTarget(
       if (targetSalaryMax !== undefined)
         targetDoc.targetSalaryMax = targetSalaryMax;
     } else {
-      // 5. Create new JobTarget document
       targetDoc = new JobTarget({
         userId: currentUser.userId,
         targetRole: targetRole.trim(),
@@ -184,12 +171,10 @@ export async function saveJobTarget(
       });
     }
 
-    // 6. Save to database
     const savedTarget = await targetDoc.save();
 
     revalidatePath("/profile");
 
-    // 7. Return serializable object
     return {
       success: true,
       target: JSON.parse(JSON.stringify(savedTarget)),
@@ -245,6 +230,3 @@ export async function resetUserProfile() {
     return { error: err.message || "Failed to reset profile" };
   }
 }
-
-
-

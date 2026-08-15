@@ -43,7 +43,6 @@ const resumeSchema = new mongoose.Schema(
   }
 );
 
-// Validation: either resumeUrl OR aboutSelf must exist (not both empty)
 resumeSchema.pre("validate", function () {
   const hasResumeUrl = Boolean(this.resumeUrl && this.resumeUrl.trim());
   const hasAboutSelf = Boolean(this.aboutSelf && this.aboutSelf.trim());
