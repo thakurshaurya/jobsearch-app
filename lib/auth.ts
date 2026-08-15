@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
 export type CurrentUser = {
   userId: string;
@@ -15,7 +15,10 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   if (!token) return null;
 
   try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as CurrentUser;
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+    const verified = await jwtVerify(token, secret);
+
+    return verified.payload as CurrentUser;
   } catch {
     // expired or tampered token
     return null;

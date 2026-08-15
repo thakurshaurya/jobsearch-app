@@ -35,7 +35,7 @@ const Header = async () => {
                     </Link>
 
                     <Link
-                        href="/upload"
+                        href="/upload?reset=true"
                         className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
                         Resume

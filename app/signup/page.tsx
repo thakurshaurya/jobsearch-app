@@ -111,7 +111,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-
             <div>
               <label className="mb-2 block text-sm font-medium text-foreground">
                 Email
@@ -131,6 +130,7 @@ export default function SignupPage() {
 
               </div>
             </div>
+
 
 
             <div>

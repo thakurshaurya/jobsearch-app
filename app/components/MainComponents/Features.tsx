@@ -98,6 +98,39 @@ function Features() {
           </span>
 
           <h2 className="mt-6 text-5xl font-black hero-gradient leading-tight">
+            Answer Simple Questions
+          </h2>
+
+          <p className="mt-6 text-lg leading-8 text-muted-foreground">
+            Tell us about your expectations regarding salary, skills, and experience. Our AI will use this information to find the best matching jobs for you.
+          </p>
+
+          <ul className="mt-8 space-y-3 text-lg">
+            <li>✅ Find your dream job</li>
+            <li>✅ Get personalized recommendations</li>
+            <li>✅ AI Match Score</li>
+            <li>✅ Application tracking</li>
+          </ul>
+        </motion.div>
+
+      </div>
+
+      <div className="flex items-center justify-center gap-24">
+        <motion.div
+          initial={{ opacity: 0, x: 80 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: false }}
+          transition={{
+            duration: 0.3,
+            ease: "easeOut",
+          }}
+          className="w-1/2 max-w-xl"
+        >
+          <span className="rounded-full bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-500">
+            Step 3
+          </span>
+
+          <h2 className="mt-6 text-5xl font-black hero-gradient leading-tight">
             Apply With Confidence
           </h2>
 
@@ -114,6 +147,24 @@ function Features() {
           </ul>
         </motion.div>
 
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          whileHover={{ y: -8 }}
+          viewport={{ once: false }}
+          transition={{
+            duration: 0.3,
+          }}
+          className="flex justify-center"
+        >
+          <Image
+            src="/Online-resume-rafiki.png"
+            alt="Apply Jobs"
+            width={520}
+            height={520}
+            className="drop-shadow-2xl"
+          />
+        </motion.div>
       </div>
 
     </section>
