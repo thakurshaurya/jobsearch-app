@@ -6,7 +6,7 @@ import { ArrowRight, BriefcaseBusiness, FileUp, Sparkles } from "lucide-react";
 
 function InitialSection() {
     return (
-        <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-6 py-10">
+        <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-6 py-10">
             <div className="pointer-events-none absolute inset-0">
                 <div className="absolute left-1/4 top-10 h-72 w-72 rounded-full bg-cyan-500/10 blur-[120px]" />
                 <div className="absolute right-1/4 bottom-10 h-72 w-72 rounded-full bg-blue-600/10 blur-[120px]" />
@@ -84,7 +84,7 @@ function InitialSection() {
                         </motion.div>
                     </Link>
 
-                    <Link href="/jobs">
+                    <Link href="/resultedjobs">
                         <motion.div
                             whileHover={{ scale: 1.04 }}
                             whileTap={{ scale: 0.97 }}
@@ -124,6 +124,7 @@ function InitialSection() {
                         Application tracking
                     </span>
                 </motion.div>
+
 
             </motion.div>
         </section>

@@ -7,6 +7,7 @@ import { connectDB } from "@/dbconfig/dbconfig";
 import User from "@/models/userModel";
 import Resume from "@/models/resumeModel";
 import JobTarget from "@/models/jobTargetModel";
+import JobApplication from "@/models/jobApplicationModel";
 import { getCurrentUser } from "@/lib/auth";
 import bcryptjs from "bcryptjs";
 import { SignJWT } from "jose";
@@ -230,3 +231,78 @@ export async function resetUserProfile() {
     return { error: err.message || "Failed to reset profile" };
   }
 }
+
+export async function getUserApplications() {
+  try {
+    await connectDB();
+    const currentUser = await getCurrentUser();
+    if (!currentUser || !currentUser.userId) {
+      return { authenticated: false, applications: [] };
+    }
+
+    const applications = await JobApplication.find({
+      userId: currentUser.userId,
+    })
+      .sort({ appliedAt: -1 })
+      .lean();
+
+    return {
+      authenticated: true,
+      applications: applications.map((app) => ({
+        ...app,
+        _id: app._id.toString(),
+        userId: app.userId.toString(),
+        appliedAt: app.appliedAt ? new Date(app.appliedAt).toISOString() : new Date().toISOString(),
+      })),
+    };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return { authenticated: false, error: err.message || "Failed to fetch applications", applications: [] };
+  }
+}
+
+export async function deleteJobApplication(id: string) {
+  try {
+    await connectDB();
+    const currentUser = await getCurrentUser();
+    if (!currentUser || !currentUser.userId) {
+      return { error: "Not authenticated" };
+    }
+
+    await JobApplication.findOneAndDelete({
+      _id: id,
+      userId: currentUser.userId,
+    });
+
+    revalidatePath("/applications");
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return { error: err.message || "Failed to delete application" };
+  }
+}
+
+export async function updateApplicationStatus(
+  id: string,
+  status: "applied" | "interviewing" | "accepted" | "rejected"
+) {
+  try {
+    await connectDB();
+    const currentUser = await getCurrentUser();
+    if (!currentUser || !currentUser.userId) {
+      return { error: "Not authenticated" };
+    }
+
+    await JobApplication.findOneAndUpdate(
+      { _id: id, userId: currentUser.userId },
+      { $set: { status } }
+    );
+
+    revalidatePath("/applications");
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return { error: err.message || "Failed to update application status" };
+  }
+}
+

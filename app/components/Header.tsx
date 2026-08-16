@@ -20,12 +20,7 @@ const Header = async () => {
 
                 {/* Navigation */}
                 <nav className="hidden items-center gap-8 md:flex">
-                    <Link
-                        href="/jobs"
-                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                        Jobs
-                    </Link>
+
 
                     <Link
                         href="/dashboard"
@@ -35,10 +30,17 @@ const Header = async () => {
                     </Link>
 
                     <Link
-                        href="/upload?reset=true"
+                        href="/applications"
                         className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
-                        Resume
+                        Applications
+                    </Link>
+
+                    <Link
+                        href="/jobs"
+                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                        Jobs
                     </Link>
 
                     <Link

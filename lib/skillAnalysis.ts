@@ -1,6 +1,4 @@
-/**
- * Common tech skills list for keyword matching against job descriptions and user resumes.
- */
+
 export const COMMON_TECH_SKILLS: string[] = [
   "React",
   "Node.js",

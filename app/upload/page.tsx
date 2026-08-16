@@ -20,6 +20,7 @@ import {
   RefreshCw,
   FileCheck,
   Trash2,
+  Check,
 } from "lucide-react";
 import {
   saveUserResume,
@@ -31,18 +32,61 @@ import { DEVICON_SKILLS, getSkillIcon } from "@/lib/devicons";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+export function extractSkillsFromText(text: string): string[] {
+  if (!text || typeof text !== "string") return [];
+
+  const commonSkills = [
+    // Frontend
+    "React", "Vue", "Angular", "Next.js", "TypeScript", "JavaScript",
+    "HTML", "CSS", "Tailwind", "Bootstrap",
+
+    // Backend
+    "Node.js", "Python", "Java", "C++", "C#", "Go", "Rust", "PHP",
+    "Django", "Flask", "Express", "Spring",
+
+    // Databases
+    "MongoDB", "PostgreSQL", "MySQL", "Firebase", "Redis", "SQL",
+
+    // DevOps/Tools
+    "Docker", "Kubernetes", "AWS", "Git", "CI/CD", "Jenkins",
+    "Linux", "Docker Compose",
+
+    // Other
+    "REST API", "GraphQL", "Microservices", "Data Structures",
+    "Algorithms", "Machine Learning", "API"
+  ];
+
+  const foundSkills = new Set<string>();
+
+  commonSkills.forEach((skill) => {
+    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const prefix = /^\w/.test(skill) ? "\\b" : "";
+    const suffix = /\w$/.test(skill) ? "\\b" : "";
+    const regex = new RegExp(`${prefix}${escaped}${suffix}`, "i");
+    if (regex.test(text)) {
+      foundSkills.add(skill);
+    }
+  });
+
+  return Array.from(foundSkills);
+}
+
 export default function UploadPage() {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [initialChecking, setInitialChecking] = useState(true);
 
+  // Step 1: Resume & Profile Bio
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [fileError, setFileError] = useState<string>("");
   const [aboutSelf, setAboutSelf] = useState<string>("");
+  const [extractedSkills, setExtractedSkills] = useState<string[]>([]);
+  const [extractedSkillInput, setExtractedSkillInput] = useState<string>("");
 
+  // Step 2: Job Preferences
   const [targetRole, setTargetRole] = useState<string>("");
   const [targetSkills, setTargetSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState<string>("");
@@ -65,6 +109,7 @@ export default function UploadPage() {
           setStep(1);
           setFile(null);
           setAboutSelf("");
+          setExtractedSkills([]);
           setTargetRole("");
           setTargetSkills([]);
         } else {
@@ -75,6 +120,19 @@ export default function UploadPage() {
               return;
             } else if (status.hasResume && !status.hasJobTarget) {
               setStep(2);
+              if (status.resume?.parsedSkills && status.resume.parsedSkills.length > 0) {
+                setExtractedSkills(status.resume.parsedSkills);
+              }
+              if (status.resume?.aboutSelf) {
+                setAboutSelf(status.resume.aboutSelf);
+              }
+            } else if (status.resume) {
+              if (status.resume.parsedSkills && status.resume.parsedSkills.length > 0) {
+                setExtractedSkills(status.resume.parsedSkills);
+              }
+              if (status.resume.aboutSelf) {
+                setAboutSelf(status.resume.aboutSelf);
+              }
             }
           }
         }
@@ -94,6 +152,7 @@ export default function UploadPage() {
       setStep(1);
       setFile(null);
       setAboutSelf("");
+      setExtractedSkills([]);
       setTargetRole("");
       setTargetSkills([]);
       setError("");
@@ -181,6 +240,47 @@ export default function UploadPage() {
     };
   };
 
+  // Handle self-description text change & auto-extract skills
+  const handleAboutSelfChange = (text: string) => {
+    setAboutSelf(text);
+    const detected = extractSkillsFromText(text);
+    if (detected.length > 0) {
+      setExtractedSkills((prev) => {
+        const set = new Set([...prev]);
+        detected.forEach((skill) => set.add(skill));
+        return Array.from(set);
+      });
+    }
+  };
+
+  const handleAddExtractedSkill = (skillToAdd: string) => {
+    const trimmed = skillToAdd.trim();
+    if (!trimmed) return;
+    if (!extractedSkills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
+      setExtractedSkills([...extractedSkills, trimmed]);
+    }
+    setExtractedSkillInput("");
+  };
+
+  const handleRemoveExtractedSkill = (skillToRemove: string) => {
+    setExtractedSkills(extractedSkills.filter((s) => s !== skillToRemove));
+  };
+
+  const handleExtractedSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      handleAddExtractedSkill(extractedSkillInput);
+    }
+  };
+
+  const toggleExtractedSuggestionSkill = (skill: string) => {
+    if (extractedSkills.includes(skill)) {
+      handleRemoveExtractedSkill(skill);
+    } else {
+      handleAddExtractedSkill(skill);
+    }
+  };
+
   const handleStep1Submit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError("");
@@ -215,12 +315,16 @@ export default function UploadPage() {
     const fakeS3Url = hasFile ? `s3://resumes/${Date.now()}_${file?.name}` : undefined;
     const { experience, education } = extractExperienceAndEducation(textTrimmed);
 
+    // Compute skills to save: include extracted skills + freshly parsed from text
+    const autoParsed = extractSkillsFromText(textTrimmed);
+    const skillsToSave = Array.from(new Set([...extractedSkills, ...autoParsed]));
+
     try {
       const res = await saveUserResume(
         sourceType,
         fakeS3Url,
         hasText ? textTrimmed : undefined,
-        [],
+        skillsToSave,
         experience || undefined,
         education || undefined
       );
@@ -243,6 +347,7 @@ export default function UploadPage() {
     }
   };
 
+  // Step 2 Skill Management
   const handleAddSkill = (skillToAdd: string) => {
     const trimmed = skillToAdd.trim();
     if (!trimmed) return;
@@ -335,9 +440,6 @@ export default function UploadPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 sm:px-6">
-      <div className="pointer-events-none absolute -top-40 -left-40 h-96 w-96 rounded-full bg-sky-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -430,6 +532,7 @@ export default function UploadPage() {
             )}
           </AnimatePresence>
 
+          {/* ================= STEP 1: RESUME & ABOUT SELF WITH SKILL EXTRACTION ================= */}
           {step === 1 && (
             <motion.form
               initial={{ opacity: 0, x: -20 }}
@@ -438,6 +541,7 @@ export default function UploadPage() {
               onSubmit={handleStep1Submit}
               className="mt-8 space-y-8"
             >
+              {/* Resume File Upload */}
               <div className="space-y-3">
                 <label className="flex items-center justify-between text-sm font-semibold text-foreground">
                   <span className="flex items-center gap-2">
@@ -451,11 +555,10 @@ export default function UploadPage() {
                   <div>
                     <div
                       {...getRootProps()}
-                      className={`group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300 cursor-pointer ${
-                        isDragActive
-                          ? "border-sky-400 bg-sky-500/10 scale-[1.01]"
-                          : "border-border hover:border-sky-400/60 hover:bg-secondary/40"
-                      }`}
+                      className={`group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300 cursor-pointer ${isDragActive
+                        ? "border-sky-400 bg-sky-500/10 scale-[1.01]"
+                        : "border-border hover:border-sky-400/60 hover:bg-secondary/40"
+                        }`}
                     >
                       <input {...getInputProps()} />
                       <div className="rounded-full bg-sky-500/10 p-4 text-sky-400 transition-transform group-hover:scale-110">
@@ -524,6 +627,7 @@ export default function UploadPage() {
                 )}
               </div>
 
+              {/* Tell Us About Yourself Textarea */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -531,11 +635,10 @@ export default function UploadPage() {
                     Tell Us About Yourself
                   </label>
                   <span
-                    className={`text-xs ${
-                      aboutSelf.length > 0 && aboutSelf.length < 50
-                        ? "text-amber-400 font-medium"
-                        : "text-muted-foreground"
-                    }`}
+                    className={`text-xs ${aboutSelf.length > 0 && aboutSelf.length < 50
+                      ? "text-amber-400 font-medium"
+                      : "text-muted-foreground"
+                      }`}
                   >
                     {aboutSelf.length} / 1000 characters
                   </span>
@@ -543,10 +646,10 @@ export default function UploadPage() {
 
                 <textarea
                   value={aboutSelf}
-                  onChange={(e) => setAboutSelf(e.target.value)}
+                  onChange={(e) => handleAboutSelfChange(e.target.value)}
                   maxLength={1000}
                   rows={4}
-                  placeholder="Your experience, skills, education, key achievements..."
+                  placeholder="Your experience, skills, education, key achievements (e.g. 'Experienced in React, TypeScript, Python, Node.js, and AWS...')"
                   className="w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground resize-none"
                 />
 
@@ -558,6 +661,100 @@ export default function UploadPage() {
                 )}
               </div>
 
+              {/* Extracted Skills Review & Editing */}
+              <div className="space-y-3 rounded-2xl border border-border/80 bg-background/50 p-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Code className="h-4 w-4 text-sky-400" />
+                    Detected / Added Skills
+                  </label>
+                  <span className="rounded-full bg-sky-500/10 px-2.5 py-0.5 text-xs font-semibold text-sky-400 border border-sky-500/20">
+                    {extractedSkills.length} {extractedSkills.length === 1 ? "skill" : "skills"}
+                  </span>
+                </div>
+
+                {/* Extracted Skills List */}
+                {extractedSkills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {extractedSkills.map((skill) => {
+                      const IconComp = getSkillIcon(skill);
+                      return (
+                        <span
+                          key={skill}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400"
+                        >
+                          <IconComp className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExtractedSkill(skill)}
+                            className="hover:text-red-400 transition-colors ml-0.5"
+                            title={`Remove ${skill}`}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">
+                    Type your skills into the self-description above (e.g. React, Python, Docker) to automatically extract them, or add them manually below.
+                  </p>
+                )}
+
+                {/* Add Manual Extracted Skill */}
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="text"
+                    value={extractedSkillInput}
+                    onChange={(e) => setExtractedSkillInput(e.target.value)}
+                    onKeyDown={handleExtractedSkillKeyDown}
+                    placeholder="Add more skills (e.g. Docker, GraphQL, Redis)..."
+                    className="flex-1 rounded-xl border border-border bg-background px-4 py-2 text-xs text-foreground outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddExtractedSkill(extractedSkillInput)}
+                    className="flex items-center gap-1 rounded-xl bg-secondary px-3.5 py-2 text-xs font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add
+                  </button>
+                </div>
+
+                {/* Quick skill suggestions */}
+                <div className="pt-1">
+                  <p className="mb-2 text-[11px] font-medium text-muted-foreground">
+                    Quick suggestions:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["React", "Node.js", "Python", "TypeScript", "JavaScript", "AWS", "Docker", "MongoDB", "PostgreSQL", "Next.js", "Tailwind"].map(
+                      (skill) => {
+                        const isSelected = extractedSkills.some((s) => s.toLowerCase() === skill.toLowerCase());
+                        const IconComp = getSkillIcon(skill);
+                        return (
+                          <button
+                            key={skill}
+                            type="button"
+                            onClick={() => toggleExtractedSuggestionSkill(skill)}
+                            className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[11px] font-medium transition-all ${isSelected
+                              ? "border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold"
+                              : "border-border bg-background/60 text-muted-foreground hover:border-sky-500/40 hover:text-foreground"
+                              }`}
+                          >
+                            <IconComp className="h-3 w-3 shrink-0" />
+                            {isSelected && <Check className="h-3 w-3" />}
+                            {skill}
+                          </button>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
               <div className="pt-2">
                 <motion.button
                   type="submit"
@@ -582,6 +779,7 @@ export default function UploadPage() {
             </motion.form>
           )}
 
+          {/* ================= STEP 2: JOB PREFERENCES ================= */}
           {step === 2 && (
             <motion.form
               initial={{ opacity: 0, x: 20 }}
@@ -680,11 +878,10 @@ export default function UploadPage() {
                             key={skillItem.name}
                             type="button"
                             onClick={() => toggleSuggestionSkill(skillItem.name)}
-                            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${
-                              isSelected
-                                ? "border-sky-500 bg-sky-500 text-slate-900 font-semibold shadow-md shadow-sky-500/20"
-                                : "border-border bg-background/60 text-muted-foreground hover:border-sky-500/50 hover:text-foreground"
-                            }`}
+                            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${isSelected
+                              ? "border-sky-500 bg-sky-500 text-slate-900 font-semibold shadow-md shadow-sky-500/20"
+                              : "border-border bg-background/60 text-muted-foreground hover:border-sky-500/50 hover:text-foreground"
+                              }`}
                           >
                             <IconComp className={`h-3.5 w-3.5 shrink-0 ${isSelected ? "text-slate-900" : "text-cyan-400"}`} />
                             {isSelected ? `✓ ${skillItem.name}` : skillItem.name}

@@ -45,12 +45,6 @@ const InitialTxt = () => {
               <FaArrowRight />
             </button>
           </Link>
-
-          <Link href="#features">
-            <button className="btn bg-transparent text-muted-foreground px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
-              Learn More
-            </button>
-          </Link>
         </motion.div>
       </div>
     </section>
