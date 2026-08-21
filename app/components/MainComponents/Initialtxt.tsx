@@ -46,7 +46,7 @@ const steps = [
     number: "01",
     title: "Upload your resume",
     description:
-      "Give JobSearch AI the information it needs to understand your professional profile.",
+      "Give JobSearch the information it needs to understand your professional profile.",
   },
   {
     number: "02",
@@ -125,7 +125,6 @@ function InitialTxt() {
         </div>
       </section>
 
-      {/* What is JobSearch AI */}
       <section className="relative px-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -141,12 +140,12 @@ function InitialTxt() {
           <h2 className="text-3xl font-black sm:text-4xl">
             What is{" "}
             <span className="hero-gradient">
-              JobSearch AI?
+              JobSearch?
             </span>
           </h2>
 
           <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-            JobSearch AI is a career-focused platform designed to reduce the
+            JobSearch is a career-focused platform designed to reduce the
             friction between your skills and your next opportunity. The idea
             is simple: understand who you are professionally, understand what
             you are looking for, and help you find opportunities that make
