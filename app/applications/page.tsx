@@ -279,7 +279,7 @@ export default function ApplicationsPage() {
   }, [applications]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background px-4 py-10 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden bg-background px-4 py-10 sm:px-6 md:px-8 lg:px-10">
       <div className="relative mx-auto max-w-7xl">
         <section className="mb-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -309,7 +309,7 @@ export default function ApplicationsPage() {
 
           {/* Stats Bar */}
           {!loading && applications.length > 0 && (
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-2xl border border-border/80 bg-card/60 p-4 backdrop-blur-xl transition-all hover:border-sky-500/40">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-muted-foreground">Total Applied</span>
@@ -359,9 +359,9 @@ export default function ApplicationsPage() {
 
         {/* ================= CONTROLS SECTION (Search, Filter, Sort, View Switch) ================= */}
         {!loading && applications.length > 0 && (
-          <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-border/80 bg-card/70 p-4 shadow-sm backdrop-blur-xl sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+          <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-border bg-card/70 p-4 sm:p-5 md:p-6 sm:flex-row sm:items-center sm:justify-between">
             {/* Search Input */}
-            <div className="relative flex-1 min-w-[240px]">
+            <div className="relative flex-1 min-w-0">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
@@ -457,7 +457,7 @@ export default function ApplicationsPage() {
 
         {/* ================= LOADING STATE ================= */}
         {loading && (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
