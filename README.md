@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jobsearch App
 
-## Getting Started
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-First, run the development server:
+A sleek, modern **Job Application Tracker** built with **Next.js 13**, **React**, **TypeScript**, and **Tailwind‑CSS** that helps you monitor your job hunt, see resume match scores, and bridge skill gaps.
+
+---
+
+## 📚 Table of Contents
+
+- [Features](#-features)
+- [Demo](#-demo)
+- [Tech Stack](#-tech-stack)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Environment Variables](#-environment-variables)
+- [API Routes](#-api-routes)
+- [Folder Structure](#-folder-structure)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## ✨ Features
+
+- **Dynamic dashboard**: Card & table view with animated transitions.
+- **Resume scoring**: Real‑time match percentages and skill‑gap analysis.
+- **Filter & sort**: Search by title, company, location; sort by recent, score, etc.
+- **Status workflow**: Track status (`applied`, `interviewing`, `accepted`, `rejected`).
+- **Responsive & premium UI**: Dark mode, glass‑morphism cards, micro‑animations.
+- **Zero‑config API**: Built‑in Next.js API routes for CRUD operations.
+- **Progressive loading**: Skeleton loaders while fetching data.
+
+---
+
+## 🎨 Demo
+
+> *You can run the app locally (see Installation) and open <http://localhost:3000> to explore the UI.*
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Next.js 13 (app router) |
+| **Language** | TypeScript |
+| **Styling** | Tailwind CSS (custom design system) |
+| **Icons** | Lucide React |
+| **Animations** | Framer Motion |
+| **UI Components** | Custom React components |
+| **API** | Next.js API routes (REST) |
+| **Deployment** | Vercel (or any Node host) |
+
+---
+
+## 📦 Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/thakurshaurya/jobsearch-app.git
+cd jobsearch-app
+
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app will be available at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Usage
 
-## Learn More
+1. **Add your resume** – Visit `/upload` to upload or reset your resume.
+2. **Search jobs** – Use the *Find More Jobs* button that leads to the curated job list.
+3. **Track applications** – Add, edit status, or delete entries directly from the dashboard.
+4. **Filter & sort** – Use the search bar, status chips, and sort dropdown.
+5. **View modes** – Switch between *Card* (visual) and *Table* (compact) view.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔑 Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Create a `.env.local` file at the project root with any required variables (e.g., database connection strings). The current version uses the built‑in file‑based API, so no additional env vars are mandatory.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📡 API Routes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `GET /api/applications` – Fetch all applications.
+- `POST /api/applications` – Create a new application.
+- `PATCH /api/applications` – Update an existing application's status.
+- `DELETE /api/applications?id=...` – Remove an application.
+
+All routes return JSON with `{ success: boolean, data?: ..., error?: string }`.
+
+---
+
+## 📂 Folder Structure
+
+```
+jobsearch-app/
+├─ app/                 # Next.js app router pages
+│   ├─ applications/    # Main dashboard page (page.tsx)
+│   ├─ api/            # API route handlers
+│   └─ ...
+├─ public/              # Static assets (icons, images)
+├─ src/                 # Re‑usable UI components & hooks (if any)
+├─ lib/                 # Helper utilities (e.g., devicons)
+├─ styles/              # Tailwind config & globals
+├─ README.md            # <‑‑ you are reading this file
+└─ package.json
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feat/awesome-feature`).
+3. Commit your changes with clear messages.
+4. Push the branch and open a Pull Request.
+5. Ensure linting and TypeScript checks pass (`npm run lint && npm run build`).
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+
+*Made with ❤️ by **Shaurya Thakur** – happy job hunting!*
