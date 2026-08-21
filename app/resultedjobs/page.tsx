@@ -269,7 +269,7 @@ export default function ResultedJobsPage() {
                 <button
                   type="submit"
                   disabled={loading || !country}
-                  className="h-14 inline-flex items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-sky-500 to-cyan-400 px-8 text-sm font-semibold text-slate-900 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 shadow-lg shadow-sky-500/20"
+                  className="h-14 inline-flex items-center justify-center gap-2 rounded-3xl bg-blue-500 px-8 text-sm font-semibold text-white transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Search className="h-4 w-4" />
                   {loading ? "Searching..." : "Search Jobs"}
@@ -405,7 +405,7 @@ export default function ResultedJobsPage() {
                         className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                           appliedJobs.has(job.id)
                             ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                            : "bg-gradient-to-r from-sky-500 to-cyan-400 text-slate-900 shadow-lg shadow-sky-500/30 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                            : "bg-blue-500 text-white hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
                         }`}
                       >
                         {applyingJobId === job.id ? (

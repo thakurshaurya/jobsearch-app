@@ -28,7 +28,7 @@ export default function LoginPage() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-10">
 
       <motion.form
-        onSubmit = {handleSubmit}
+        onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{
@@ -137,7 +137,7 @@ export default function LoginPage() {
               whileTap={{
                 scale: 0.97,
               }}
-              className="mt-3 w-full rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-3 w-full rounded-xl bg-blue-500 py-3 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Logging in..." : "Login"}
             </motion.button>

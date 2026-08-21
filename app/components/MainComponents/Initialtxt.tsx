@@ -40,7 +40,7 @@ const InitialTxt = () => {
           className="mt-12 flex justify-center gap-5"
         >
           <Link href="/login">
-            <button className="btn btn-primary px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
+            <button className="btn bg-blue-500 px-8 py-6 rounded-xl text-lg shadow-lg hover:scale-105 transition-all duration-300">
               Get Started
               <FaArrowRight />
             </button>

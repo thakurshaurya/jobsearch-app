@@ -80,11 +80,6 @@ export default function JobsPage() {
                 query: query.trim(),
             });
 
-            /*
-              Use city if selected.
-      
-              Otherwise use country.
-            */
 
             const location = city || country;
 
@@ -194,7 +189,7 @@ export default function JobsPage() {
                     {/* Search Box */}
                     <div className="flex flex-col gap-6 rounded-[1.8rem] border border-slate-200/80 bg-slate-950/5 p-6 shadow-inner dark:border-slate-800/70 dark:bg-slate-950/40">
 
-                        <div className="relative overflow-hidden rounded-3xl bg-white/90 p-1 shadow-lg dark:bg-slate-950/80">
+                        <div className="relative overflow-hidden rounded-3xl bg-white/90 p-7 shadow-lg dark:bg-slate-950/80">
 
                             {/* Search Fields */}
                             <div className="mt-4 flex flex-wrap gap-4">
@@ -202,7 +197,7 @@ export default function JobsPage() {
                                 {/* Job */}
                                 <label className="flex w-full flex-col gap-2 lg:flex-[1.8]">
 
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    <span className="text-sm ml-1.25 font-medium text-slate-700 dark:text-slate-200">
                                         Job title, role or company
                                     </span>
 
@@ -213,7 +208,7 @@ export default function JobsPage() {
                                             setQuery(event.target.value)
                                         }
                                         placeholder="e.g. React Developer"
-                                        className="h-14 w-full rounded-3xl border border-slate-300/80 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-slate-800"
+                                        className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-slate-800"
                                     />
 
                                 </label>
@@ -221,7 +216,7 @@ export default function JobsPage() {
                                 {/* Country */}
                                 <label className="flex w-full flex-col gap-2 lg:flex-1">
 
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    <span className="text-sm ml-1.25 font-medium text-slate-700 dark:text-slate-200">
                                         Country
                                     </span>
 
@@ -236,7 +231,7 @@ export default function JobsPage() {
 
                                                 setCity("");
                                             }}
-                                            className="h-14 w-full rounded-3xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                                            className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                                         >
 
                                             <option value="">
@@ -265,7 +260,7 @@ export default function JobsPage() {
                                 {/* City */}
                                 <label className="flex w-full flex-col gap-2 lg:flex-1">
 
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    <span className="text-sm ml-1.25 font-medium text-slate-700 dark:text-slate-200">
                                         City
                                     </span>
 
@@ -277,7 +272,7 @@ export default function JobsPage() {
                                             onChange={(event) =>
                                                 setCity(event.target.value)
                                             }
-                                            className="h-14 w-full rounded-3xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:disabled:bg-slate-900/40"
+                                            className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:disabled:bg-slate-900/40"
                                         >
 
                                             <option value="">
@@ -304,9 +299,9 @@ export default function JobsPage() {
                                 </label>
 
                                 {/* Posted */}
-                                <label className="flex w-full flex-col gap-2 lg:flex-1">
+                                <label className="flex w-full flex-col gap-2  lg:flex-1">
 
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    <span className="text-sm ml-1.25 font-medium text-slate-700 dark:text-slate-200">
                                         When was it posted?
                                     </span>
 
@@ -317,7 +312,7 @@ export default function JobsPage() {
                                             onChange={(event) =>
                                                 setPosted(event.target.value)
                                             }
-                                            className="h-14 w-full rounded-3xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                                            className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                                         >
 
                                             <option value="">
@@ -351,7 +346,7 @@ export default function JobsPage() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="inline-flex items-center gap-2 rounded-3xl bg-gradient-to-r from-sky-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-slate-900 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="inline-flex items-center gap-2 rounded-3xl bg-blue-500 px-6 py-3 text-sm font-semibold transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
 
                                     <Search className="h-4 w-4" />
@@ -506,17 +501,16 @@ export default function JobsPage() {
                                                     applyingJobId === job.id ||
                                                     appliedJobs.has(job.id)
                                                 }
-                                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                                                    appliedJobs.has(job.id)
-                                                        ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                                                        : "bg-gradient-to-r from-sky-500 to-cyan-400 text-slate-900 shadow-lg shadow-sky-500/30 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
-                                                }`}
+                                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${appliedJobs.has(job.id)
+                                                    ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                                    : "bg-blue-500 text-white hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    }`}
                                             >
                                                 {applyingJobId === job.id
                                                     ? "Applying..."
                                                     : appliedJobs.has(job.id)
-                                                    ? "✓ Interested"
-                                                    : "Interested"}
+                                                        ? "✓ Interested"
+                                                        : "Interested"}
                                             </button>
 
                                             {job.applyUrl && (

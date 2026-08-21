@@ -281,8 +281,11 @@ export default function UploadPage() {
     }
   };
 
-  const handleStep1Submit = async (e?: React.FormEvent) => {
+  const handleStep1Submit = async (
+    e?: React.FormEvent
+  ) => {
     if (e) e.preventDefault();
+
     setError("");
     setSuccessMsg("");
     setFailedSubmissionStep(null);
@@ -292,38 +295,113 @@ export default function UploadPage() {
     const hasText = textTrimmed.length > 0;
 
     if (!hasFile && !hasText) {
-      setError("Please complete either the resume upload or self-description (or both).");
+      setError(
+        "Please upload a resume or tell us about yourself."
+      );
       return;
     }
 
     if (hasText && textTrimmed.length < 50) {
-      setError("Self-description must be at least 50 characters long (or clear it and upload a resume instead).");
+      setError(
+        "Self-description must be at least 50 characters long."
+      );
       return;
     }
 
     setLoading(true);
 
-    let sourceType: "resume" | "about_self" | "both" = "resume";
-    if (hasFile && hasText) {
-      sourceType = "both";
-    } else if (hasText) {
-      sourceType = "about_self";
-    } else {
-      sourceType = "resume";
-    }
-
-    const fakeS3Url = hasFile ? `s3://resumes/${Date.now()}_${file?.name}` : undefined;
-    const { experience, education } = extractExperienceAndEducation(textTrimmed);
-
-    // Compute skills to save: include extracted skills + freshly parsed from text
-    const autoParsed = extractSkillsFromText(textTrimmed);
-    const skillsToSave = Array.from(new Set([...extractedSkills, ...autoParsed]));
-
     try {
+      let parsedResumeText = "";
+
+      // --------------------------------
+      // 1. Parse uploaded resume
+      // --------------------------------
+      if (file) {
+        const formData = new FormData();
+
+        formData.append("resume", file);
+
+        const parseResponse = await fetch(
+          "/api/resume/parse",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const parseData = await parseResponse.json();
+
+        if (!parseResponse.ok) {
+          throw new Error(
+            parseData?.error ||
+            "Failed to parse resume"
+          );
+        }
+
+        parsedResumeText = parseData.text;
+      }
+
+      // --------------------------------
+      // 2. Combine resume + self description
+      // --------------------------------
+
+      const combinedText = [
+        parsedResumeText,
+        textTrimmed,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      // --------------------------------
+      // 3. Extract skills
+      // --------------------------------
+
+      const autoParsed =
+        extractSkillsFromText(combinedText);
+
+      const skillsToSave = Array.from(
+        new Set([
+          ...extractedSkills,
+          ...autoParsed,
+        ])
+      );
+
+      // --------------------------------
+      // 4. Extract experience/education
+      // --------------------------------
+
+      const {
+        experience,
+        education,
+      } = extractExperienceAndEducation(
+        combinedText
+      );
+
+      // --------------------------------
+      // 5. Determine source
+      // --------------------------------
+
+      let sourceType:
+        | "resume"
+        | "about_self"
+        | "both";
+
+      if (file && hasText) {
+        sourceType = "both";
+      } else if (file) {
+        sourceType = "resume";
+      } else {
+        sourceType = "about_self";
+      }
+
+      // --------------------------------
+      // 6. Save profile
+      // --------------------------------
+
       const res = await saveUserResume(
         sourceType,
-        fakeS3Url,
-        hasText ? textTrimmed : undefined,
+        undefined,
+        combinedText || undefined,
         skillsToSave,
         experience || undefined,
         education || undefined
@@ -332,15 +410,31 @@ export default function UploadPage() {
       if (res?.error) {
         setError(res.error);
         setFailedSubmissionStep(1);
-      } else {
-        setSuccessMsg("Profile saved! Now tell us about your job preferences.");
-        setTimeout(() => {
-          setSuccessMsg("");
-          setStep(2);
-        }, 1200);
+        return;
       }
-    } catch (err: any) {
-      setError(err?.message || "Network error occurred while saving profile. Please try again.");
+
+      setExtractedSkills(skillsToSave);
+
+      setSuccessMsg(
+        "Resume analyzed successfully! Now tell us about your job preferences."
+      );
+
+      setTimeout(() => {
+        setSuccessMsg("");
+        setStep(2);
+      }, 1200);
+
+    } catch (error: any) {
+      console.error(
+        "Resume submission error:",
+        error
+      );
+
+      setError(
+        error?.message ||
+        "Failed to process your resume."
+      );
+
       setFailedSubmissionStep(1);
     } finally {
       setLoading(false);
@@ -472,7 +566,7 @@ export default function UploadPage() {
 
           <div className="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
             <motion.div
-              className="h-full bg-gradient-to-r from-sky-500 to-cyan-400"
+              className="h-full bg-blue-500"
               initial={{ width: step === 1 ? "50%" : "50%" }}
               animate={{ width: step === 1 ? "50%" : "100%" }}
               transition={{ duration: 0.4 }}
@@ -532,7 +626,7 @@ export default function UploadPage() {
             )}
           </AnimatePresence>
 
-          {/* ================= STEP 1: RESUME & ABOUT SELF WITH SKILL EXTRACTION ================= */}
+
           {step === 1 && (
             <motion.form
               initial={{ opacity: 0, x: -20 }}
@@ -612,7 +706,7 @@ export default function UploadPage() {
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
                           <div
-                            className="h-full bg-gradient-to-r from-sky-400 to-cyan-400 transition-all duration-150"
+                            className="h-full bg-blue-500 transition-all duration-150"
                             style={{ width: `${uploadProgress}%` }}
                           />
                         </div>
@@ -761,7 +855,7 @@ export default function UploadPage() {
                   disabled={loading || isUploading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3.5 text-base font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all hover:shadow-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-base font-semibold text-slate-900 transition-all  disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -946,7 +1040,7 @@ export default function UploadPage() {
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 py-3.5 text-base font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition-all hover:shadow-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-base font-semibold text-slate-900 transition-all  disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>

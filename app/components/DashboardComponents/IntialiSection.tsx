@@ -21,19 +21,6 @@ function InitialSection() {
                 }}
                 className="relative z-10 flex w-full max-w-4xl flex-col items-center text-center"
             >
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                        delay: 0.1,
-                        duration: 0.4,
-                    }}
-                    className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-4 py-2 text-sm font-medium text-muted-foreground backdrop-blur"
-                >
-                    <Sparkles className="h-4 w-4 text-cyan-500" />
-                    AI-powered job search
-                </motion.div>
-
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -76,7 +63,7 @@ function InitialSection() {
                         <motion.div
                             whileHover={{ scale: 1.04 }}
                             whileTap={{ scale: 0.97 }}
-                            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 via-cyan-500 to-indigo-500 px-7 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/20 transition-shadow hover:shadow-cyan-500/40"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-500 px-7 py-4 text-base font-semibold text-white"
                         >
                             <FileUp className="h-5 w-5" />
                             Upload Resume
