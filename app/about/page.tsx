@@ -31,7 +31,7 @@ export default function AboutPage() {
                     </h1>
 
                     <p className="mx-auto mt-7 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl">
-                        JobSearch AI is built around a simple idea: finding a job
+                        JobSearch is built around a simple idea: finding a job
                         shouldn't mean spending hours searching through thousands of
                         listings hoping to find something relevant.
                     </p>
@@ -96,7 +96,7 @@ export default function AboutPage() {
                         </div>
 
                         <p className="mt-8 text-lg leading-8 text-muted-foreground">
-                            JobSearch AI is designed to understand a user's professional
+                            JobSearch is designed to understand a user's professional
                             profile and turn that information into a more focused job
                             search. Instead of treating every listing as equally relevant,
                             the goal is to help users spend more time on opportunities that
@@ -208,7 +208,7 @@ export default function AboutPage() {
                         </h2>
 
                         <p className="mt-6 max-w-4xl text-lg leading-8 text-muted-foreground">
-                            JobSearch AI isn't meant to replace the job seeker. It is meant
+                            JobSearch isn't meant to replace the job seeker. It is meant
                             to remove some of the repetitive work around the job search so
                             that the user can focus on what actually matters: improving
                             their skills, preparing for interviews, and finding work that

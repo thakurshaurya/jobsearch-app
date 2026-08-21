@@ -88,7 +88,7 @@ function InitialTxt() {
             transition={{ delay: 0.2, duration: 0.2 }}
             className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl"
           >
-            JobSearch AI is built to make finding the right opportunity
+            JobSearch is built to make finding the right opportunity
             simpler. Instead of spending hours jumping between job portals,
             use one platform to understand your profile, discover relevant
             jobs, and manage your search.

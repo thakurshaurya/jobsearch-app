@@ -28,12 +28,12 @@ function Features() {
           </h2>
 
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            Upload your resume in PDF format. Our AI extracts your skills,
+            Upload your resume in PDF format. We extract your skills,
             education, projects and experience within seconds.
           </p>
 
           <ul className="mt-8 space-y-3 text-lg">
-            <li>✅ AI extracts skills automatically</li>
+            <li>✅ Extracts skills automatically</li>
             <li>✅ ATS-friendly parsing</li>
             <li>✅ Supports PDF resumes</li>
             <li>✅ Instant profile generation</li>
@@ -102,13 +102,13 @@ function Features() {
           </h2>
 
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            Tell us about your expectations regarding salary, skills, and experience. Our AI will use this information to find the best matching jobs for you.
+            Tell us about your expectations regarding salary, skills, and experience. We will use this information to find the best matching jobs for you.
           </p>
 
           <ul className="mt-8 space-y-3 text-lg">
             <li>✅ Find your dream job</li>
             <li>✅ Get personalized recommendations</li>
-            <li>✅ AI Match Score</li>
+            <li>✅ Match Score</li>
             <li>✅ Application tracking</li>
           </ul>
         </motion.div>
@@ -135,14 +135,14 @@ function Features() {
           </h2>
 
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            Browse AI-curated jobs, apply directly using trusted links and
+            Browse jobs, apply directly using trusted links and
             monitor every application from one dashboard.
           </p>
 
           <ul className="mt-8 space-y-3 text-lg">
             <li>✅ Live job listings</li>
             <li>✅ Direct apply links</li>
-            <li>✅ AI Match Score</li>
+            <li>✅ Match Score</li>
             <li>✅ Application tracking</li>
           </ul>
         </motion.div>
