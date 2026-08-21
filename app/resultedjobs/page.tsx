@@ -195,24 +195,24 @@ export default function ResultedJobsPage() {
         <form
           onSubmit={handleSearchSubmit}
           autoComplete="off"
-          className="flex flex-col gap-8 rounded-[2rem] border border-white/10 bg-white/80 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-950/75 sm:p-12"
+          className="flex flex-col gap-8 rounded-[2rem] border border-white/10 bg-white/80 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-950/75 sm:p-10"
         >
           <div className="flex flex-col items-center gap-4 text-center">
-            <p className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-700 shadow-sm dark:bg-slate-900/80 dark:text-slate-100">
+            {/* <p className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-700 shadow-sm dark:bg-slate-900/80 dark:text-slate-100">
               <Globe2 className="h-4 w-4 text-cyan-400" />
               Tailored Job Recommendations
-            </p>
-            <h1 className="hero-gradient text-3xl font-extrabold sm:text-4xl">
+            </p> */}
+            <h1 className="hero-gradient py-1 text-3xl font-extrabold sm:text-4xl">
               Jobs Matching Your Preferences
             </h1>
 
             {jobTarget && (
               <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-2.5 text-xs font-medium text-cyan-300">
                 <span className="flex items-center gap-1 font-semibold text-foreground">
-                  <Briefcase className="h-3.5 w-3.5 text-cyan-400" />
+                  <Briefcase className="h-3.5 w-3.5 text-cyan-500" />
                   Target Role:
                 </span>
-                <span className="rounded-md bg-cyan-500/10 px-2 py-0.5 text-cyan-300 font-bold">
+                <span className="rounded-md bg-cyan-500/10 px-2 py-0.5 text-cyan-500 font-bold">
                   {jobTarget.targetRole}
                 </span>
 
@@ -220,7 +220,7 @@ export default function ResultedJobsPage() {
                   <>
                     <span className="mx-1 text-slate-500">•</span>
                     <span className="font-semibold text-foreground">Skills:</span>
-                    <span className="text-slate-300">
+                    <span className="text-slate-500">
                       {jobTarget.targetSkills.join(", ")}
                     </span>
                   </>
@@ -228,7 +228,7 @@ export default function ResultedJobsPage() {
 
                 <Link
                   href="/upload?reset=true"
-                  className="ml-2 inline-flex items-center gap-1 rounded-full border border-sky-400/40 bg-sky-500/20 px-3 py-1 text-xs font-bold text-sky-200 hover:bg-sky-500/30 transition-colors shadow-sm"
+                  className="ml-2 inline-flex items-center gap-1 rounded-full border border-sky-400/40 bg-sky-500/20 px-3 py-1 text-xs font-bold text-sky-400 hover:bg-sky-500/30 transition-colors shadow-sm"
                   title="Edit application profile & target preferences"
                 >
                   <Pencil className="h-3 w-3" />
@@ -277,7 +277,7 @@ export default function ResultedJobsPage() {
               </div>
 
               {!country && (
-                <p className="mt-3 text-xs font-medium text-amber-400 flex items-center gap-1.5">
+                <p className="mt-3 text-xs font-medium text-red-400 flex items-center gap-1.5">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   Please select a country to fetch recent job listings for your target role.
                 </p>
@@ -327,9 +327,8 @@ export default function ResultedJobsPage() {
               <p className="text-sm text-slate-600 dark:text-slate-300">
                 {loading
                   ? "Searching recent openings..."
-                  : `Showing ${jobs.length} recent result${
-                      jobs.length === 1 ? "" : "s"
-                    } matching "${jobTarget?.targetRole}".`}
+                  : `Showing ${jobs.length} recent result${jobs.length === 1 ? "" : "s"
+                  } matching "${jobTarget?.targetRole}".`}
               </p>
             </div>
 
@@ -402,11 +401,10 @@ export default function ResultedJobsPage() {
                         disabled={
                           applyingJobId === job.id || appliedJobs.has(job.id)
                         }
-                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          appliedJobs.has(job.id)
-                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                            : "bg-blue-500 text-white hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
-                        }`}
+                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${appliedJobs.has(job.id)
+                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                          : "bg-blue-500 text-white hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                          }`}
                       >
                         {applyingJobId === job.id ? (
                           <span className="flex items-center gap-1.5">

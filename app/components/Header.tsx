@@ -9,16 +9,14 @@ const Header = async () => {
     return (
         <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-
-                {/* Logo */}
                 <Link
                     href="/"
-                    className="text-2xl font-extrabold hero-gradient tracking-tight"
+                    className="text-2xl font-extrabold hero-gradient tracking-tight mr-[-50]"
                 >
                     JobSearch AI
                 </Link>
 
-                {/* Navigation */}
+
                 <nav className="hidden items-center gap-8 md:flex">
 
 
@@ -51,7 +49,6 @@ const Header = async () => {
                     </Link>
                 </nav>
 
-                {/* Right Section */}
                 <div className="flex items-center gap-4">
 
                     <Darkmode />
@@ -86,18 +83,18 @@ const Header = async () => {
                                 <li className="menu-title">
                                     <span>{user.username}</span>
                                 </li>
-
-                                <li>
+                                {/* will be adding the later */}
+                                {/* <li>
                                     <Link href="/profile">Profile</Link>
                                 </li>
 
                                 <li>
                                     <Link href="/settings">Settings</Link>
-                                </li>
-
+                                </li> */}
+                                {/* 
                                 <li>
                                     <Link href="/applications">Applications</Link>
-                                </li>
+                                </li> */}
 
                                 <div className="my-2 border-t border-border" />
 

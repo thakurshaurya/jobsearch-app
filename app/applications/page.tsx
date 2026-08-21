@@ -61,7 +61,6 @@ export default function ApplicationsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  // Fetch applications on component mount
   const fetchApplications = async () => {
     setLoading(true);
     setError("");
@@ -90,7 +89,6 @@ export default function ApplicationsPage() {
     fetchApplications();
   }, []);
 
-  // Delete an application
   const handleDeleteApplication = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!confirm("Are you sure you want to remove this job application?")) {
@@ -116,7 +114,6 @@ export default function ApplicationsPage() {
     }
   };
 
-  // Update status of an application
   const handleStatusChange = async (
     id: string,
     newStatus: "applied" | "interviewing" | "accepted" | "rejected"
@@ -144,7 +141,6 @@ export default function ApplicationsPage() {
     }
   };
 
-  // Relative time helper
   const formatRelativeTime = (dateString?: string) => {
     if (!dateString) return "Recently";
     try {
@@ -171,7 +167,6 @@ export default function ApplicationsPage() {
     }
   };
 
-  // Color helpers
   const getScoreColorConfig = (score: number = 0) => {
     if (score >= 67) {
       return {
@@ -233,11 +228,9 @@ export default function ApplicationsPage() {
     }
   };
 
-  // Filter and sort applications
   const filteredApplications = useMemo(() => {
     let result = [...applications];
 
-    // Search filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(
@@ -249,12 +242,10 @@ export default function ApplicationsPage() {
       );
     }
 
-    // Status filter
     if (statusFilter !== "all") {
       result = result.filter((app) => app.status === statusFilter);
     }
 
-    // Sorting
     result.sort((a, b) => {
       if (sortBy === "recent") {
         return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
@@ -274,7 +265,6 @@ export default function ApplicationsPage() {
     return result;
   }, [applications, searchQuery, statusFilter, sortBy]);
 
-  // Statistics
   const stats = useMemo(() => {
     const total = applications.length;
     if (total === 0) {
@@ -564,7 +554,7 @@ export default function ApplicationsPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.25 }}
-                    className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card/80 p-6 shadow-xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-sky-500/40 hover:shadow-2xl hover:shadow-sky-500/10"
+                    className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card/80 p-6 shadow-xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-sky-500/40 "
                   >
                     {/* Top Glow Accent */}
                     {/* <div
@@ -572,14 +562,12 @@ export default function ApplicationsPage() {
                     /> */}
 
                     <div>
-                      {/* Card Header: Applied Date & Status */}
                       <div className="flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3.5 w-3.5" />
                           {formatRelativeTime(app.appliedAt)}
                         </span>
 
-                        {/* Status selector badge */}
                         <div className="relative">
                           <select
                             value={app.status}
@@ -609,7 +597,6 @@ export default function ApplicationsPage() {
                         </div>
                       </div>
 
-                      {/* Job Title & Company */}
                       <div className="mt-4">
                         <h2 className="text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-sky-400">
                           {app.jobTitle || "Software Engineer"}
@@ -628,9 +615,7 @@ export default function ApplicationsPage() {
                         </div>
                       </div>
 
-                      {/* Middle: Skills Breakdown (2 columns) */}
                       <div className="mt-5 grid grid-cols-1 gap-3 rounded-2xl border border-border/60 bg-background/50 p-3.5 text-xs sm:grid-cols-2">
-                        {/* Matching Skills */}
                         <div className="flex flex-col gap-1.5">
                           <div className="flex items-center justify-between text-[11px] font-semibold text-emerald-500">
                             <span className="flex items-center gap-1">
@@ -661,7 +646,6 @@ export default function ApplicationsPage() {
                           </div>
                         </div>
 
-                        {/* Skill Gap */}
                         <div className="flex flex-col gap-1.5 border-t border-border/40 pt-2 sm:border-t-0 sm:border-l sm:pl-3 sm:pt-0">
                           <div className="flex items-center justify-between text-[11px] font-semibold text-rose-400">
                             <span className="flex items-center gap-1">
@@ -693,19 +677,17 @@ export default function ApplicationsPage() {
                         </div>
                       </div>
 
-                      {/* Metrics: Resume Score & Chance */}
                       <div className="mt-5 space-y-2">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-semibold text-foreground">Resume Match</span>
                           <span className={`font-bold ${scoreConfig.text}`}>{score}% Match</span>
                         </div>
 
-                        {/* Progress Bar */}
                         <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${score}%` }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
                             className={`h-full bg-gradient-to-r ${scoreConfig.gradient} rounded-full`}
                           />
                         </div>
@@ -724,7 +706,6 @@ export default function ApplicationsPage() {
                       </div>
                     </div>
 
-                    {/* Footer Actions */}
                     <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
                       {app.jobUrl ? (
                         <a
@@ -760,7 +741,6 @@ export default function ApplicationsPage() {
           </div>
         )}
 
-        {/* ================= MAIN CONTENT - TABLE VIEW ================= */}
         {!loading && !error && filteredApplications.length > 0 && viewMode === "table" && (
           <div className="overflow-hidden rounded-3xl border border-border/80 bg-card/80 shadow-xl backdrop-blur-xl">
             <div className="overflow-x-auto">
@@ -788,7 +768,6 @@ export default function ApplicationsPage() {
                         key={app._id}
                         className="transition-colors hover:bg-secondary/30"
                       >
-                        {/* Job & Company */}
                         <td className="px-6 py-4">
                           <div className="font-bold text-foreground">
                             {app.jobTitle || "Software Engineer"}
@@ -799,12 +778,10 @@ export default function ApplicationsPage() {
                           </div>
                         </td>
 
-                        {/* Location */}
                         <td className="px-4 py-4 text-xs text-muted-foreground">
                           {app.location || "Remote / Unspecified"}
                         </td>
 
-                        {/* Match Score */}
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
                             <div className="w-12 text-xs font-bold ${scoreConfig.text}">
@@ -818,7 +795,6 @@ export default function ApplicationsPage() {
                           </div>
                         </td>
 
-                        {/* Status */}
                         <td className="px-4 py-4">
                           <select
                             value={app.status}
@@ -846,7 +822,6 @@ export default function ApplicationsPage() {
                           </select>
                         </td>
 
-                        {/* Your Skills */}
                         <td className="px-4 py-4">
                           <div className="flex flex-wrap gap-1 max-w-xs">
                             {app.matchingSkills && app.matchingSkills.length > 0 ? (
@@ -869,7 +844,6 @@ export default function ApplicationsPage() {
                           </div>
                         </td>
 
-                        {/* Skill Gap */}
                         <td className="px-4 py-4">
                           <div className="flex flex-wrap gap-1 max-w-xs">
                             {app.skillGap && app.skillGap.length > 0 ? (
@@ -892,12 +866,10 @@ export default function ApplicationsPage() {
                           </div>
                         </td>
 
-                        {/* Applied Date */}
                         <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
                           {formatRelativeTime(app.appliedAt)}
                         </td>
 
-                        {/* Actions */}
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             {app.jobUrl && (
