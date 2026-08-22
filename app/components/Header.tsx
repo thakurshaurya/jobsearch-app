@@ -2,6 +2,7 @@ import Link from "next/link";
 import Darkmode from "./Darkmode";
 import { getCurrentUser } from "@/lib/auth";
 import { logoutUser } from "@/app/action";
+import HeaderMobileMenu from "./HeaderMobileMenu";
 
 const Header = async () => {
     const user = await getCurrentUser();
@@ -11,7 +12,7 @@ const Header = async () => {
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
                 <Link
                     href="/"
-                    className="text-2xl font-extrabold hero-gradient tracking-tight mr-[-50]"
+                    className="text-2xl font-extrabold hero-gradient tracking-tight mr-[-20]"
                 >
                     JobSearch
                 </Link>
@@ -38,7 +39,7 @@ const Header = async () => {
                         href="/jobs"
                         className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
-                        Jobs
+                        Search
                     </Link>
 
                     <Link
@@ -53,61 +54,65 @@ const Header = async () => {
 
                     <Darkmode />
 
-                    {!user ? (
-                        <Link
-                            href="/login"
-                            className="btn bg-transparent text-muted-foreground rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
-                        >
-                            Log In
-                        </Link>
-                    ) : (
-                        <div className="dropdown dropdown-end">
-
-                            <div
-                                tabIndex={0}
-                                role="button"
-                                className="avatar cursor-pointer transition-transform hover:scale-105"
+                    <div className="hidden md:block">
+                        {!user ? (
+                            <Link
+                                href="/login"
+                                className="btn bg-transparent text-muted-foreground rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
                             >
-                                <div className="w-10 rounded-full ring ring-primary ring-offset-2 ring-offset-background">
-                                    <img
-                                        alt={user.username}
-                                        src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.username)}`}
-                                    />
+                                Log In
+                            </Link>
+                        ) : (
+                            <div className="dropdown dropdown-end">
+
+                                <div
+                                    tabIndex={0}
+                                    role="button"
+                                    className="avatar cursor-pointer transition-transform hover:scale-105"
+                                >
+                                    <div className="w-10 rounded-full ring ring-primary ring-offset-2 ring-offset-background">
+                                        <img
+                                            alt={user.username}
+                                            src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.username)}`}
+                                        />
+                                    </div>
                                 </div>
+
+                                <ul
+                                    tabIndex={-1}
+                                    className="menu dropdown-content mt-3 w-56 rounded-2xl border border-border bg-card p-2 shadow-xl"
+                                >
+                                    <li className="menu-title">
+                                        <span>{user.username}</span>
+                                    </li>
+                                    {/* will be adding the later */}
+                                    {/* <li>
+                                        <Link href="/profile">Profile</Link>
+                                    </li>
+
+                                    <li>
+                                        <Link href="/settings">Settings</Link>
+                                    </li> */}
+                                    {/* 
+                                    <li>
+                                        <Link href="/applications">Applications</Link>
+                                    </li> */}
+
+                                    <div className="my-2 border-t border-border" />
+
+                                    <li>
+                                        <form action={logoutUser}>
+                                            <button type="submit" className="text-red-500 w-full text-left">
+                                                Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </div>
+                        )}
+                    </div>
 
-                            <ul
-                                tabIndex={-1}
-                                className="menu dropdown-content mt-3 w-56 rounded-2xl border border-border bg-card p-2 shadow-xl"
-                            >
-                                <li className="menu-title">
-                                    <span>{user.username}</span>
-                                </li>
-                                {/* will be adding the later */}
-                                {/* <li>
-                                    <Link href="/profile">Profile</Link>
-                                </li>
-
-                                <li>
-                                    <Link href="/settings">Settings</Link>
-                                </li> */}
-                                {/* 
-                                <li>
-                                    <Link href="/applications">Applications</Link>
-                                </li> */}
-
-                                <div className="my-2 border-t border-border" />
-
-                                <li>
-                                    <form action={logoutUser}>
-                                        <button type="submit" className="text-red-500 w-full text-left">
-                                            Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    )}
+                    <HeaderMobileMenu user={user} />
                 </div>
 
             </div>

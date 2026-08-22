@@ -307,7 +307,6 @@ export default function ApplicationsPage() {
             </div>
           </div>
 
-          {/* Stats Bar */}
           {!loading && applications.length > 0 && (
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-2xl border border-border/80 bg-card/60 p-4 backdrop-blur-xl transition-all hover:border-sky-500/40">
@@ -357,10 +356,8 @@ export default function ApplicationsPage() {
           )}
         </section>
 
-        {/* ================= CONTROLS SECTION (Search, Filter, Sort, View Switch) ================= */}
         {!loading && applications.length > 0 && (
           <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-border bg-card/70 p-4 sm:p-5 md:p-6 sm:flex-row sm:items-center sm:justify-between">
-            {/* Search Input */}
             <div className="relative flex-1 min-w-0">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -371,11 +368,8 @@ export default function ApplicationsPage() {
                 className="h-10 w-full rounded-xl border border-border bg-background pl-10 pr-4 text-sm text-foreground outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
               />
             </div>
-
-            {/* Filter & Sort Controls */}
             <div className="flex flex-wrap items-center gap-2.5">
-              {/* Status Filter Buttons */}
-              <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1 text-xs">
+              <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1 text-xs overflow-x-scroll">
                 {(["all", "applied", "interviewing", "accepted", "rejected"] as const).map(
                   (status) => (
                     <button
@@ -393,7 +387,6 @@ export default function ApplicationsPage() {
                 )}
               </div>
 
-              {/* Sort Selector */}
               <div className="relative">
                 <select
                   value={sortBy}
@@ -408,7 +401,6 @@ export default function ApplicationsPage() {
                 <ArrowUpDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               </div>
 
-              {/* View Toggle */}
               <div className="flex items-center rounded-xl border border-border bg-background p-1">
                 <button
                   type="button"
@@ -437,7 +429,6 @@ export default function ApplicationsPage() {
           </section>
         )}
 
-        {/* ================= ERROR STATE ================= */}
         {error && (
           <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-400 backdrop-blur-xl">
             <div className="flex items-center gap-3">
@@ -455,7 +446,6 @@ export default function ApplicationsPage() {
           </div>
         )}
 
-        {/* ================= LOADING STATE ================= */}
         {loading && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -482,7 +472,6 @@ export default function ApplicationsPage() {
           </div>
         )}
 
-        {/* ================= EMPTY STATE (NO APPLICATIONS OVERALL) ================= */}
         {!loading && !error && applications.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -516,7 +505,6 @@ export default function ApplicationsPage() {
           </motion.div>
         )}
 
-        {/* ================= EMPTY FILTER STATE ================= */}
         {!loading && !error && applications.length > 0 && filteredApplications.length === 0 && (
           <div className="flex min-h-[40vh] flex-col items-center justify-center rounded-3xl border border-border bg-card/40 p-8 text-center backdrop-blur-xl">
             <Filter className="h-12 w-12 text-muted-foreground" />
@@ -537,7 +525,6 @@ export default function ApplicationsPage() {
           </div>
         )}
 
-        {/* ================= MAIN CONTENT - CARD VIEW ================= */}
         {!loading && !error && filteredApplications.length > 0 && viewMode === "card" && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">

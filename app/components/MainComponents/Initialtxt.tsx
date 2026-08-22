@@ -299,14 +299,13 @@ function InitialTxt() {
         </div>
       </section>
 
-      {/* Values / Philosophy */}
       <section className="relative px-6 py-24">
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.4 }}
-          className="mx-auto flex max-w-6xl flex-col items-center rounded-[2rem] border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-background to-blue-500/10 p-10 text-center sm:p-16"
+          className="mx-auto flex max-w-6xl flex-col items-center rounded-[2rem] border border-cyan-500/20 p-10 text-center sm:p-16"
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-500">
             <CheckCircle2 className="h-7 w-7" />

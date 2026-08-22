@@ -77,7 +77,6 @@ export default function UploadPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [initialChecking, setInitialChecking] = useState(true);
 
-  // Step 1: Resume & Profile Bio
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -86,7 +85,6 @@ export default function UploadPage() {
   const [extractedSkills, setExtractedSkills] = useState<string[]>([]);
   const [extractedSkillInput, setExtractedSkillInput] = useState<string>("");
 
-  // Step 2: Job Preferences
   const [targetRole, setTargetRole] = useState<string>("");
   const [targetSkills, setTargetSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState<string>("");
@@ -240,7 +238,6 @@ export default function UploadPage() {
     };
   };
 
-  // Handle self-description text change & auto-extract skills
   const handleAboutSelfChange = (text: string) => {
     setAboutSelf(text);
     const detected = extractSkillsFromText(text);
@@ -377,10 +374,6 @@ export default function UploadPage() {
         combinedText
       );
 
-      // --------------------------------
-      // 5. Determine source
-      // --------------------------------
-
       let sourceType:
         | "resume"
         | "about_self"
@@ -394,9 +387,6 @@ export default function UploadPage() {
         sourceType = "about_self";
       }
 
-      // --------------------------------
-      // 6. Save profile
-      // --------------------------------
 
       const res = await saveUserResume(
         sourceType,
@@ -441,7 +431,6 @@ export default function UploadPage() {
     }
   };
 
-  // Step 2 Skill Management
   const handleAddSkill = (skillToAdd: string) => {
     const trimmed = skillToAdd.trim();
     if (!trimmed) return;
@@ -635,7 +624,6 @@ export default function UploadPage() {
               onSubmit={handleStep1Submit}
               className="mt-8 space-y-8"
             >
-              {/* Resume File Upload */}
               <div className="space-y-3">
                 <label className="flex items-center justify-between text-sm font-semibold text-foreground">
                   <span className="flex items-center gap-2">
@@ -721,7 +709,6 @@ export default function UploadPage() {
                 )}
               </div>
 
-              {/* Tell Us About Yourself Textarea */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -755,7 +742,6 @@ export default function UploadPage() {
                 )}
               </div>
 
-              {/* Extracted Skills Review & Editing */}
               <div className="space-y-3 rounded-2xl border border-border/80 bg-background/50 p-4">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -767,7 +753,6 @@ export default function UploadPage() {
                   </span>
                 </div>
 
-                {/* Extracted Skills List */}
                 {extractedSkills.length > 0 ? (
                   <div className="flex flex-wrap gap-2 pt-1">
                     {extractedSkills.map((skill) => {
@@ -797,8 +782,7 @@ export default function UploadPage() {
                   </p>
                 )}
 
-                {/* Add Manual Extracted Skill */}
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex flex-wrap items-center gap-2 pt-1">
                   <input
                     type="text"
                     value={extractedSkillInput}
@@ -817,7 +801,6 @@ export default function UploadPage() {
                   </button>
                 </div>
 
-                {/* Quick skill suggestions */}
                 <div className="pt-1">
                   <p className="mb-2 text-[11px] font-medium text-muted-foreground">
                     Quick suggestions:
@@ -848,7 +831,6 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <div className="pt-2">
                 <motion.button
                   type="submit"
@@ -873,7 +855,6 @@ export default function UploadPage() {
             </motion.form>
           )}
 
-          {/* ================= STEP 2: JOB PREFERENCES ================= */}
           {step === 2 && (
             <motion.form
               initial={{ opacity: 0, x: 20 }}
@@ -928,7 +909,7 @@ export default function UploadPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <input
                     type="text"
                     value={skillInput}

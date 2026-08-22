@@ -218,11 +218,12 @@ export default function ResultedJobsPage() {
 
                 {jobTarget.targetSkills && jobTarget.targetSkills.length > 0 && (
                   <>
-                    <span className="mx-1 text-slate-500">•</span>
-                    <span className="font-semibold text-foreground">Skills:</span>
-                    <span className="text-slate-500">
-                      {jobTarget.targetSkills.join(", ")}
-                    </span>
+                    <div className="flex  justify-center gap-1">
+                      <span className="font-semibold text-foreground">Skills:</span>
+                      <span className="text-slate-500">
+                        {jobTarget.targetSkills.join(", ")}
+                      </span>
+                    </div>
                   </>
                 )}
 
@@ -239,7 +240,7 @@ export default function ResultedJobsPage() {
           </div>
 
           <div className="flex flex-col gap-6 rounded-[1.8rem] border border-slate-200/80 bg-slate-950/5 p-6 shadow-inner dark:border-slate-800/70 dark:bg-slate-950/40">
-            <div className="relative overflow-hidden rounded-3xl bg-white/90 p-6 shadow-lg dark:bg-slate-950/80">
+            <div className="relative overflow-hidden rounded-3xl bg-white/90 p-4 shadow-lg dark:bg-slate-950/80">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end justify-between">
                 <label className="flex w-full flex-col gap-2 flex-1">
                   <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
@@ -254,7 +255,7 @@ export default function ResultedJobsPage() {
                       required
                       className="h-14 w-full rounded-3xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-slate-800 cursor-pointer"
                     >
-                      <option value="">Choose a country to see recent jobs</option>
+                      <option value="">Choose a country</option>
                       {countryOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
