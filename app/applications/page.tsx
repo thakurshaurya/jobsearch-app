@@ -607,7 +607,7 @@ export default function ApplicationsPage() {
                           <div className="flex items-center justify-between text-[11px] font-semibold text-emerald-500">
                             <span className="flex items-center gap-1">
                               <Check className="h-3 w-3" />
-                              Your Skills
+                              Matched Skills
                             </span>
                             <span>{app.matchingSkills?.length || 0}</span>
                           </div>
@@ -637,7 +637,7 @@ export default function ApplicationsPage() {
                           <div className="flex items-center justify-between text-[11px] font-semibold text-rose-400">
                             <span className="flex items-center gap-1">
                               <XCircle className="h-3 w-3" />
-                              Skills Needed
+                              Missing Skills
                             </span>
                             <span>{app.skillGap?.length || 0}</span>
                           </div>
