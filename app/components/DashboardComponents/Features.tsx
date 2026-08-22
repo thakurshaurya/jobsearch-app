@@ -64,7 +64,7 @@ function Features() {
 
 
       {/* Step 2 */}
-      <div className="flex flex-col-reverse md:flex-row items-center justify-center gap-12 md:gap-24">
+      <div className="flex overflow-hidden flex-col-reverse md:flex-row items-center justify-center gap-12 md:gap-24">
 
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
