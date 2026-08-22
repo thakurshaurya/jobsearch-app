@@ -46,7 +46,7 @@ const steps = [
     number: "01",
     title: "Upload your resume",
     description:
-      "Give JobSearch the information it needs to understand your professional profile.",
+      "Give JobHunt the information it needs to understand your professional profile.",
   },
   {
     number: "02",
@@ -88,7 +88,7 @@ function InitialTxt() {
             transition={{ delay: 0.2, duration: 0.2 }}
             className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl"
           >
-            JobSearch is built to make finding the right opportunity
+            JobHunt is built to make finding the right opportunity
             simpler. Instead of spending hours jumping between job portals,
             use one platform to understand your profile, discover relevant
             jobs, and manage your search.
@@ -140,12 +140,12 @@ function InitialTxt() {
           <h2 className="text-3xl font-black sm:text-4xl">
             What is{" "}
             <span className="hero-gradient">
-              JobSearch?
+              JobHunt?
             </span>
           </h2>
 
           <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-            JobSearch is a career-focused platform designed to reduce the
+            JobHunt is a career-focused platform designed to reduce the
             friction between your skills and your next opportunity. The idea
             is simple: understand who you are professionally, understand what
             you are looking for, and help you find opportunities that make

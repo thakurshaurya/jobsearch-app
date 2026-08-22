@@ -1,4 +1,4 @@
-# Jobsearch App
+# JobHunt App
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -58,8 +58,8 @@ A sleek, modern **Job Application Tracker** built with **Next.js 13**, **React**
 
 ```bash
 # Clone the repository
-git clone https://github.com/thakurshaurya/jobsearch-app.git
-cd jobsearch-app
+git clone https://github.com/thakurshaurya/jobhunt-app.git
+cd jobhunt-app
 
 # Install dependencies
 npm install
@@ -102,7 +102,7 @@ All routes return JSON with `{ success: boolean, data?: ..., error?: string }`.
 ## 📂 Folder Structure
 
 ```
-jobsearch-app/
+jobhunt-app/
 ├─ app/                 # Next.js app router pages
 │   ├─ applications/    # Main dashboard page (page.tsx)
 │   ├─ api/            # API route handlers

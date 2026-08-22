@@ -43,7 +43,7 @@ export const sendMail = async ({
         const mailResponse = await transport.sendMail({
             from: {
                 address: "thakurshaurya2007@gmail.com",
-                name: "JobSearch AI",
+                name: "JobHunt AI",
             },
             to: email,
             subject,

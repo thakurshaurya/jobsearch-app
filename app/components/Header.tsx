@@ -14,7 +14,7 @@ const Header = async () => {
                     href="/"
                     className="text-2xl font-extrabold hero-gradient tracking-tight mr-[-20]"
                 >
-                    JobSearch
+                    JobHunt
                 </Link>
 
 
