@@ -26,6 +26,26 @@ const resumeSchema = new mongoose.Schema(
     aboutSelf: {
       type: String,
     },
+    resumeText: {
+      type: String,
+      default: null,
+    },
+    roles: {
+      type: [String],
+      default: [],
+    },
+    seniority: {
+      type: String,
+      default: null,
+    },
+    locations: {
+      type: [String],
+      default: [],
+    },
+    searchQueries: {
+      type: [String],
+      default: [],
+    },
     sourceType: {
       type: String,
       enum: {

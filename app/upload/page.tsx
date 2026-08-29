@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, FileRejection } from "react-dropzone";
 import { motion, AnimatePresence } from "motion/react";
 import {
   UploadCloud,
@@ -10,17 +10,16 @@ import {
   CheckCircle2,
   AlertCircle,
   X,
-  Plus,
   Loader2,
   ArrowRight,
   Briefcase,
   Code,
   IndianRupee,
   Sparkles,
-  RefreshCw,
   FileCheck,
   Trash2,
   Check,
+  MapPin,
 } from "lucide-react";
 import {
   saveUserResume,
@@ -28,7 +27,8 @@ import {
   getUserProfileStatus,
   resetUserProfile,
 } from "@/app/action";
-import { DEVICON_SKILLS, getSkillIcon } from "@/lib/devicons";
+import { getSkillIcon } from "@/lib/devicons";
+import { countryOptions } from "@/lib/locations";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -77,26 +77,40 @@ export default function UploadPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [initialChecking, setInitialChecking] = useState(true);
 
+  // Resume / file input states
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [fileError, setFileError] = useState<string>("");
   const [aboutSelf, setAboutSelf] = useState<string>("");
-  const [extractedSkills, setExtractedSkills] = useState<string[]>([]);
-  const [extractedSkillInput, setExtractedSkillInput] = useState<string>("");
 
-  const [targetRole, setTargetRole] = useState<string>("");
-  const [targetSkills, setTargetSkills] = useState<string[]>([]);
+  // AI Loading states
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [loadingStage, setLoadingStage] = useState<string>("");
+
+  // AI Profile data (returned by Gemini or loaded from db)
+  const [parsedText, setParsedText] = useState<string>("");
+  const [candidateName, setCandidateName] = useState<string>("");
+  const [experienceYears, setExperienceYears] = useState<string>("");
+  const [seniority, setSeniority] = useState<string>("Mid Level");
+  const [education, setEducation] = useState<string>("");
+  const [aiSkills, setAiSkills] = useState<string[]>([]);
+  const [aiRoles, setAiRoles] = useState<string[]>([]);
+  const [aiLocations, setAiLocations] = useState<string[]>([]);
+  const [searchQueries, setSearchQueries] = useState<string[]>([]);
+
+  // Editing state inputs
   const [skillInput, setSkillInput] = useState<string>("");
+  const [roleInput, setRoleInput] = useState<string>("");
+  const [locationInput, setLocationInput] = useState<string>("");
+  const [targetRole, setTargetRole] = useState<string>("");
   const [targetSalaryMin, setTargetSalaryMin] = useState<string>("");
   const [targetSalaryMax, setTargetSalaryMax] = useState<string>("");
+  const [targetCountry, setTargetCountry] = useState<string>("India");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
-  const [failedSubmissionStep, setFailedSubmissionStep] = useState<1 | 2 | null>(
-    null
-  );
 
   useEffect(() => {
     async function checkExistingProfile() {
@@ -107,30 +121,45 @@ export default function UploadPage() {
           setStep(1);
           setFile(null);
           setAboutSelf("");
-          setExtractedSkills([]);
+          setCandidateName("");
+          setExperienceYears("");
+          setSeniority("Mid Level");
+          setEducation("");
+          setAiSkills([]);
+          setAiRoles([]);
+          setAiLocations([]);
           setTargetRole("");
-          setTargetSkills([]);
+          setTargetSalaryMin("");
+          setTargetSalaryMax("");
+          setTargetCountry("India");
         } else {
           const status = await getUserProfileStatus();
           if (status.authenticated) {
             if (status.hasResume && status.hasJobTarget) {
               router.push("/resultedjobs");
               return;
-            } else if (status.hasResume && !status.hasJobTarget) {
-              setStep(2);
-              if (status.resume?.parsedSkills && status.resume.parsedSkills.length > 0) {
-                setExtractedSkills(status.resume.parsedSkills);
-              }
-              if (status.resume?.aboutSelf) {
-                setAboutSelf(status.resume.aboutSelf);
-              }
             } else if (status.resume) {
-              if (status.resume.parsedSkills && status.resume.parsedSkills.length > 0) {
-                setExtractedSkills(status.resume.parsedSkills);
+              // Populate edit state if resume exists but job target is incomplete
+              const r = status.resume;
+              setParsedText(r.resumeText || r.aboutSelf || "");
+              setCandidateName(r.aboutSelf?.split("\n")?.[0] || "");
+              setExperienceYears(r.experience || "");
+              setEducation(r.education || "");
+              setAiSkills(r.parsedSkills || []);
+              setAiRoles(r.roles || []);
+              setSeniority(r.seniority || "Mid Level");
+              setAiLocations(r.locations || []);
+              setSearchQueries(r.searchQueries || []);
+              
+              if (status.jobTarget) {
+                setTargetRole(status.jobTarget.targetRole || "");
+                setTargetSalaryMin(status.jobTarget.targetSalaryMin?.toString() || "");
+                setTargetSalaryMax(status.jobTarget.targetSalaryMax?.toString() || "");
+                setTargetCountry(status.jobTarget.targetCountry || "India");
+              } else if (r.roles && r.roles.length > 0) {
+                setTargetRole(r.roles[0]);
               }
-              if (status.resume.aboutSelf) {
-                setAboutSelf(status.resume.aboutSelf);
-              }
+              setStep(2);
             }
           }
         }
@@ -150,16 +179,24 @@ export default function UploadPage() {
       setStep(1);
       setFile(null);
       setAboutSelf("");
-      setExtractedSkills([]);
+      setCandidateName("");
+      setExperienceYears("");
+      setSeniority("Mid Level");
+      setEducation("");
+      setAiSkills([]);
+      setAiRoles([]);
+      setAiLocations([]);
       setTargetRole("");
-      setTargetSkills([]);
+      setTargetSalaryMin("");
+      setTargetSalaryMax("");
+      setTargetCountry("India");
       setError("");
       setSuccessMsg("Previous profile data deleted. You can now submit new profile details.");
       setLoading(false);
     }
   };
 
-  const handleFileDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
+  const handleFileDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     setFileError("");
     setError("");
 
@@ -218,286 +255,225 @@ export default function UploadPage() {
     setFileError("");
   };
 
-  const extractExperienceAndEducation = (text: string) => {
-    if (!text.trim()) return { experience: null, education: null };
-
-    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-    const expKeywords = ["experience", "worked", "year", "years", "role", "company", "developer", "engineer"];
-    const eduKeywords = ["education", "degree", "university", "college", "bachelor", "master", "b.tech", "m.tech", "phd", "graduated"];
-
-    const expLines = lines.filter((line) =>
-      expKeywords.some((kw) => line.toLowerCase().includes(kw))
-    );
-    const eduLines = lines.filter((line) =>
-      eduKeywords.some((kw) => line.toLowerCase().includes(kw))
-    );
-
-    return {
-      experience: expLines.length > 0 ? expLines.join("; ") : text.slice(0, 300),
-      education: eduLines.length > 0 ? eduLines.join("; ") : null,
-    };
-  };
-
-  const handleAboutSelfChange = (text: string) => {
-    setAboutSelf(text);
-    const detected = extractSkillsFromText(text);
-    if (detected.length > 0) {
-      setExtractedSkills((prev) => {
-        const set = new Set([...prev]);
-        detected.forEach((skill) => set.add(skill));
-        return Array.from(set);
-      });
-    }
-  };
-
-  const handleAddExtractedSkill = (skillToAdd: string) => {
-    const trimmed = skillToAdd.trim();
-    if (!trimmed) return;
-    if (!extractedSkills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
-      setExtractedSkills([...extractedSkills, trimmed]);
-    }
-    setExtractedSkillInput("");
-  };
-
-  const handleRemoveExtractedSkill = (skillToRemove: string) => {
-    setExtractedSkills(extractedSkills.filter((s) => s !== skillToRemove));
-  };
-
-  const handleExtractedSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      handleAddExtractedSkill(extractedSkillInput);
-    }
-  };
-
-  const toggleExtractedSuggestionSkill = (skill: string) => {
-    if (extractedSkills.includes(skill)) {
-      handleRemoveExtractedSkill(skill);
-    } else {
-      handleAddExtractedSkill(skill);
-    }
-  };
-
-  const handleStep1Submit = async (
-    e?: React.FormEvent
-  ) => {
-    if (e) e.preventDefault();
-
+  // Analyze Resume with Gemini via backend API route
+  const handleAnalyzeResume = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError("");
     setSuccessMsg("");
-    setFailedSubmissionStep(null);
 
     const hasFile = Boolean(file);
     const textTrimmed = aboutSelf.trim();
-    const hasText = textTrimmed.length > 0;
 
-    if (!hasFile && !hasText) {
-      setError(
-        "Please upload a resume or tell us about yourself."
-      );
+    if (!hasFile && !textTrimmed) {
+      setError("Please upload a resume or describe your professional experience.");
       return;
     }
 
-    if (hasText && textTrimmed.length < 50) {
-      setError(
-        "Self-description must be at least 50 characters long."
-      );
-      return;
-    }
-
-    setLoading(true);
+    setIsAnalyzing(true);
+    setLoadingStage("Scanning resume...");
 
     try {
       let parsedResumeText = "";
 
-      // --------------------------------
-      // 1. Parse uploaded resume
-      // --------------------------------
+      // 1. Parsing file if uploaded
       if (file) {
         const formData = new FormData();
-
         formData.append("resume", file);
 
-        const parseResponse = await fetch(
-          "/api/resume/parse",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
+        const parseResponse = await fetch("/api/resume/parse", {
+          method: "POST",
+          body: formData,
+        });
 
         const parseData = await parseResponse.json();
 
         if (!parseResponse.ok) {
-          throw new Error(
-            parseData?.error ||
-            "Failed to parse resume"
-          );
+          throw new Error(parseData?.error || "Failed to parse resume file");
         }
 
         parsedResumeText = parseData.text;
       }
 
-      // --------------------------------
-      // 2. Combine resume + self description
-      // --------------------------------
-
-      const combinedText = [
-        parsedResumeText,
-        textTrimmed,
-      ]
-        .filter(Boolean)
-        .join("\n\n");
-
-      // --------------------------------
-      // 3. Extract skills
-      // --------------------------------
-
-      const autoParsed =
-        extractSkillsFromText(combinedText);
-
-      const skillsToSave = Array.from(
-        new Set([
-          ...extractedSkills,
-          ...autoParsed,
-        ])
-      );
-
-      // --------------------------------
-      // 4. Extract experience/education
-      // --------------------------------
-
-      const {
-        experience,
-        education,
-      } = extractExperienceAndEducation(
-        combinedText
-      );
-
-      let sourceType:
-        | "resume"
-        | "about_self"
-        | "both";
-
-      if (file && hasText) {
-        sourceType = "both";
-      } else if (file) {
-        sourceType = "resume";
-      } else {
-        sourceType = "about_self";
+      // If no file but we have text description
+      if (!parsedResumeText && textTrimmed) {
+        parsedResumeText = textTrimmed;
       }
 
+      // 2. Multi-stage loading animation updates
+      const stages = [
+        "Understanding your profile...",
+        "Identifying core skills...",
+        "Finding relevant roles...",
+        "Generating job search queries...",
+        "Preparing profile review..."
+      ];
+      
+      let stageIndex = 0;
+      const stageInterval = setInterval(() => {
+        if (stageIndex < stages.length) {
+          setLoadingStage(stages[stageIndex]);
+          stageIndex++;
+        } else {
+          clearInterval(stageInterval);
+        }
+      }, 1200);
 
-      const res = await saveUserResume(
-        sourceType,
-        undefined,
-        combinedText || undefined,
-        skillsToSave,
-        experience || undefined,
-        education || undefined
-      );
+      // 3. Request structured AI profile from backend
+      const analyzeResponse = await fetch("/api/ai/analyze-resume", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resumeText: parsedResumeText,
+          aboutSelf: textTrimmed || undefined,
+        }),
+      });
 
-      if (res?.error) {
-        setError(res.error);
-        setFailedSubmissionStep(1);
-        return;
+      clearInterval(stageInterval);
+      const analyzeData = await analyzeResponse.json();
+
+      if (!analyzeResponse.ok) {
+        throw new Error(analyzeData?.error || "Gemini failed to analyze the resume");
       }
 
-      setExtractedSkills(skillsToSave);
+      const { analysis } = analyzeData;
 
-      setSuccessMsg(
-        "Resume analyzed successfully! Now tell us about your job preferences."
-      );
+      // 4. Populate review states
+      setParsedText(parsedResumeText);
+      setCandidateName(analysis.candidate?.name || "");
+      setExperienceYears(analysis.candidate?.experienceYears?.toString() || "0");
+      setSeniority(analysis.candidate?.seniority || "Mid Level");
+      setEducation(analysis.candidate?.education?.join(", ") || "");
+      setAiSkills(analysis.skills || []);
+      setAiRoles(analysis.roles || []);
+      setAiLocations(analysis.locations || []);
+      setSearchQueries(analysis.searchQueries || []);
 
+      // Pre-fill target role with the primary recommendation
+      if (analysis.roles && analysis.roles.length > 0) {
+        setTargetRole(analysis.roles[0]);
+      }
+
+      setSuccessMsg("AI analysis complete! Please review and save your profile.");
+      
       setTimeout(() => {
         setSuccessMsg("");
         setStep(2);
-      }, 1200);
+      }, 1000);
 
-    } catch (error: any) {
-      console.error(
-        "Resume submission error:",
-        error
-      );
-
-      setError(
-        error?.message ||
-        "Failed to process your resume."
-      );
-
-      setFailedSubmissionStep(1);
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to analyze resume with AI.";
+      console.error("AI Analysis error:", err);
+      setError(errorMsg);
     } finally {
-      setLoading(false);
+      setIsAnalyzing(false);
+      setLoadingStage("");
     }
   };
 
-  const handleAddSkill = (skillToAdd: string) => {
-    const trimmed = skillToAdd.trim();
-    if (!trimmed) return;
-    if (!targetSkills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
-      setTargetSkills([...targetSkills, trimmed]);
-    }
-    setSkillInput("");
-  };
-
-  const handleRemoveSkill = (skillToRemove: string) => {
-    setTargetSkills(targetSkills.filter((s) => s !== skillToRemove));
-  };
-
-  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      handleAddSkill(skillInput);
-    }
-  };
-
-  const toggleSuggestionSkill = (skill: string) => {
-    if (targetSkills.includes(skill)) {
-      handleRemoveSkill(skill);
-    } else {
-      handleAddSkill(skill);
-    }
-  };
-
-  const handleStep2Submit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  // Save reviewed AI Profile to Database
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError("");
     setSuccessMsg("");
-    setFailedSubmissionStep(null);
 
     if (!targetRole.trim()) {
-      setError("Target role is required. Please specify what role you are looking for.");
+      setError("Please select or type a target job role.");
+      return;
+    }
+
+    if (!targetCountry.trim()) {
+      setError("Please select a target country.");
       return;
     }
 
     setLoading(true);
 
-    const minVal = targetSalaryMin ? parseFloat(targetSalaryMin) : undefined;
-    const maxVal = targetSalaryMax ? parseFloat(targetSalaryMax) : undefined;
-
     try {
-      const res = await saveJobTarget(
-        targetRole.trim(),
-        targetSkills.length > 0 ? targetSkills : undefined,
-        minVal,
-        maxVal
+      // 1. Save Resume Model details
+      const saveResumeResult = await saveUserResume(
+        file ? "both" : "about_self",
+        undefined,
+        aboutSelf.trim() || parsedText,
+        aiSkills,
+        experienceYears,
+        education,
+        parsedText,
+        aiRoles,
+        seniority,
+        aiLocations,
+        searchQueries
       );
 
-      if (res?.error) {
-        setError(res.error);
-        setFailedSubmissionStep(2);
-      } else {
-        setSuccessMsg("Preferences saved! Redirecting to jobs...");
-        setTimeout(() => {
-          router.push("/resultedjobs");
-        }, 1500);
+      if (saveResumeResult?.error) {
+        throw new Error(saveResumeResult.error);
       }
-    } catch (err: any) {
-      setError(err?.message || "Network error occurred while saving preferences. Please try again.");
-      setFailedSubmissionStep(2);
+
+      // 2. Save JobTarget Model details
+      const minVal = targetSalaryMin ? parseFloat(targetSalaryMin) : undefined;
+      const maxVal = targetSalaryMax ? parseFloat(targetSalaryMax) : undefined;
+
+      const saveTargetResult = await saveJobTarget(
+        targetRole.trim(),
+        aiSkills.length > 0 ? aiSkills : undefined,
+        minVal,
+        maxVal,
+        targetCountry
+      );
+
+      if (saveTargetResult?.error) {
+        throw new Error(saveTargetResult.error);
+      }
+
+      setSuccessMsg("AI Profile saved successfully! Loading matching jobs...");
+      setTimeout(() => {
+        router.push("/resultedjobs");
+      }, 1200);
+
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to save your profile preferences.";
+      console.error("Error saving profile:", err);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddSkill = (skill: string) => {
+    const trimmed = skill.trim();
+    if (trimmed && !aiSkills.includes(trimmed)) {
+      setAiSkills([...aiSkills, trimmed]);
+    }
+    setSkillInput("");
+  };
+
+  const handleRemoveSkill = (skill: string) => {
+    setAiSkills(aiSkills.filter((s) => s !== skill));
+  };
+
+  const handleAddRole = (role: string) => {
+    const trimmed = role.trim();
+    if (trimmed && !aiRoles.includes(trimmed)) {
+      setAiRoles([...aiRoles, trimmed]);
+    }
+    setRoleInput("");
+  };
+
+  const handleRemoveRole = (role: string) => {
+    setAiRoles(aiRoles.filter((r) => r !== role));
+  };
+
+  const handleAddLocation = (loc: string) => {
+    const trimmed = loc.trim();
+    if (trimmed && !aiLocations.includes(trimmed)) {
+      setAiLocations([...aiLocations, trimmed]);
+    }
+    setLocationInput("");
+  };
+
+  const handleRemoveLocation = (loc: string) => {
+    setAiLocations(aiLocations.filter((l) => l !== loc));
   };
 
   const formatRupee = (val: string) => {
@@ -564,14 +540,34 @@ export default function UploadPage() {
 
           <div className="mt-6 text-center">
             <h1 className="hero-gradient text-3xl font-extrabold sm:text-4xl">
-              {step === 1 ? "Setup Your Profile" : "Job Preferences"}
+              {step === 1 ? "AI Resume Upload" : "Verify AI Profile"}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               {step === 1
-                ? "Upload your resume or tell us about your experience to get started."
-                : "Help us find the right opportunities matching your goals."}
+                ? "Upload your resume or tell us about your experience to generate your AI profile."
+                : "Verify the information Gemini extracted from your resume."}
             </p>
           </div>
+
+          {/* AI Progress overlay */}
+          <AnimatePresence>
+            {isAnalyzing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-3xl bg-slate-950/80 backdrop-blur-md"
+              >
+                <Loader2 className="h-12 w-12 animate-spin text-sky-400" />
+                <h3 className="mt-4 text-lg font-bold text-white tracking-wide">
+                  AI analysis in progress
+                </h3>
+                <p className="mt-2 text-sm text-cyan-400 font-semibold animate-pulse">
+                  {loadingStage}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <AnimatePresence mode="wait">
             {error && (
@@ -585,20 +581,6 @@ export default function UploadPage() {
                   <AlertCircle className="h-5 w-5 shrink-0 text-red-400" />
                   <span>{error}</span>
                 </div>
-                {failedSubmissionStep && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      failedSubmissionStep === 1
-                        ? handleStep1Submit()
-                        : handleStep2Submit()
-                    }
-                    className="flex shrink-0 items-center gap-1.5 rounded-lg bg-red-500/20 px-3 py-1.5 text-xs font-semibold text-red-300 transition hover:bg-red-500/30"
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                    Retry
-                  </button>
-                )}
               </motion.div>
             )}
 
@@ -615,13 +597,13 @@ export default function UploadPage() {
             )}
           </AnimatePresence>
 
-
+          {/* STEP 1: RESUME UPLOAD AND BASIC TEXT */}
           {step === 1 && (
             <motion.form
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              onSubmit={handleStep1Submit}
+              onSubmit={handleAnalyzeResume}
               className="mt-8 space-y-8"
             >
               <div className="space-y-3">
@@ -637,10 +619,11 @@ export default function UploadPage() {
                   <div>
                     <div
                       {...getRootProps()}
-                      className={`group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300 cursor-pointer ${isDragActive
-                        ? "border-sky-400 bg-sky-500/10 scale-[1.01]"
-                        : "border-border hover:border-sky-400/60 hover:bg-secondary/40"
-                        }`}
+                      className={`group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300 cursor-pointer ${
+                        isDragActive
+                          ? "border-sky-400 bg-sky-500/10 scale-[1.01]"
+                          : "border-border hover:border-sky-400/60 hover:bg-secondary/40"
+                      }`}
                     >
                       <input {...getInputProps()} />
                       <div className="rounded-full bg-sky-500/10 p-4 text-sky-400 transition-transform group-hover:scale-110">
@@ -702,7 +685,7 @@ export default function UploadPage() {
                     ) : (
                       <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-emerald-400">
                         <CheckCircle2 className="h-4 w-4" />
-                        File ready for submission
+                        File ready for AI analysis
                       </div>
                     )}
                   </div>
@@ -713,279 +696,332 @@ export default function UploadPage() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-cyan-400" />
-                    Tell Us About Yourself
+                    Additional Details / Self Description (Optional)
                   </label>
-                  <span
-                    className={`text-xs ${aboutSelf.length > 0 && aboutSelf.length < 50
-                      ? "text-amber-400 font-medium"
-                      : "text-muted-foreground"
-                      }`}
-                  >
+                  <span className="text-xs text-muted-foreground">
                     {aboutSelf.length} / 1000 characters
                   </span>
                 </div>
 
                 <textarea
                   value={aboutSelf}
-                  onChange={(e) => handleAboutSelfChange(e.target.value)}
+                  onChange={(e) => setAboutSelf(e.target.value)}
                   maxLength={1000}
                   rows={4}
-                  placeholder="Your experience, skills, education, key achievements (e.g. 'Experienced in React, TypeScript, Python, Node.js, and AWS...')"
+                  placeholder="You can write custom career achievements or additional details to override or supplement your resume (e.g. 'Looking to transition to React Developer after 2 years of Java backend experience...')"
                   className="w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground resize-none"
                 />
-
-                {aboutSelf.length > 0 && aboutSelf.length < 50 && (
-                  <p className="text-xs text-amber-400 font-medium flex items-center gap-1">
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    At least 50 characters required if providing self-description ({50 - aboutSelf.length} more needed).
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-3 rounded-2xl border border-border/80 bg-background/50 p-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <Code className="h-4 w-4 text-sky-400" />
-                    Detected / Added Skills
-                  </label>
-                  <span className="rounded-full bg-sky-500/10 px-2.5 py-0.5 text-xs font-semibold text-sky-400 border border-sky-500/20">
-                    {extractedSkills.length} {extractedSkills.length === 1 ? "skill" : "skills"}
-                  </span>
-                </div>
-
-                {extractedSkills.length > 0 ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {extractedSkills.map((skill) => {
-                      const IconComp = getSkillIcon(skill);
-                      return (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400"
-                        >
-                          <IconComp className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                          {skill}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveExtractedSkill(skill)}
-                            className="hover:text-red-400 transition-colors ml-0.5"
-                            title={`Remove ${skill}`}
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground italic">
-                    Type your skills into the self-description above (e.g. React, Python, Docker) to automatically extract them, or add them manually below.
-                  </p>
-                )}
-
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <input
-                    type="text"
-                    value={extractedSkillInput}
-                    onChange={(e) => setExtractedSkillInput(e.target.value)}
-                    onKeyDown={handleExtractedSkillKeyDown}
-                    placeholder="Add more skills (e.g. Docker, GraphQL, Redis)..."
-                    className="flex-1 rounded-xl border border-border bg-background px-4 py-2 text-xs text-foreground outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleAddExtractedSkill(extractedSkillInput)}
-                    className="flex items-center gap-1 rounded-xl bg-secondary px-3.5 py-2 text-xs font-medium text-foreground hover:bg-secondary/80 transition-colors"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    Add
-                  </button>
-                </div>
-
-                <div className="pt-1">
-                  <p className="mb-2 text-[11px] font-medium text-muted-foreground">
-                    Quick suggestions:
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {["React", "Node.js", "Python", "TypeScript", "JavaScript", "AWS", "Docker", "MongoDB", "PostgreSQL", "Next.js", "Tailwind"].map(
-                      (skill) => {
-                        const isSelected = extractedSkills.some((s) => s.toLowerCase() === skill.toLowerCase());
-                        const IconComp = getSkillIcon(skill);
-                        return (
-                          <button
-                            key={skill}
-                            type="button"
-                            onClick={() => toggleExtractedSuggestionSkill(skill)}
-                            className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[11px] font-medium transition-all ${isSelected
-                              ? "border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold"
-                              : "border-border bg-background/60 text-muted-foreground hover:border-sky-500/40 hover:text-foreground"
-                              }`}
-                          >
-                            <IconComp className="h-3 w-3 shrink-0" />
-                            {isSelected && <Check className="h-3 w-3" />}
-                            {skill}
-                          </button>
-                        );
-                      }
-                    )}
-                  </div>
-                </div>
               </div>
 
               <div className="pt-2">
                 <motion.button
                   type="submit"
-                  disabled={loading || isUploading}
+                  disabled={isAnalyzing || isUploading || (!file && !aboutSelf.trim())}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-base font-semibold text-slate-900 transition-all  disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-base font-semibold text-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Saving Profile...
-                    </>
-                  ) : (
-                    <>
-                      Save Profile
-                      <ArrowRight className="h-5 w-5" />
-                    </>
-                  )}
+                  Analyze Resume with Gemini
+                  <ArrowRight className="h-5 w-5" />
                 </motion.button>
               </div>
             </motion.form>
           )}
 
+          {/* STEP 2: REVIEW AI PROFILE & EXPECTATIONS */}
           {step === 2 && (
             <motion.form
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              onSubmit={handleStep2Submit}
+              onSubmit={handleSaveProfile}
               className="mt-8 space-y-6"
             >
+              {/* Profile details */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={candidateName}
+                    onChange={(e) => setCandidateName(e.target.value)}
+                    placeholder="Candidate Name"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Seniority Level
+                  </label>
+                  <select
+                    value={seniority}
+                    onChange={(e) => setSeniority(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
+                  >
+                    <option value="Entry Level">Entry Level</option>
+                    <option value="Mid Level">Mid Level</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead / Manager</option>
+                    <option value="Executive">Executive</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Years of Experience
+                  </label>
+                  <input
+                    type="number"
+                    value={experienceYears}
+                    onChange={(e) => setExperienceYears(e.target.value)}
+                    min={0}
+                    placeholder="e.g. 3"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Education / Qualifications
+                  </label>
+                  <input
+                    type="text"
+                    value={education}
+                    onChange={(e) => setEducation(e.target.value)}
+                    placeholder="e.g. B.Tech Computer Science"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                  />
+                </div>
+              </div>
+
+              {/* Target role */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Briefcase className="h-4 w-4 text-sky-400" />
-                  What role are you looking for? <span className="text-red-400">*</span>
+                  Primary Target Job Role <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={targetRole}
-                  onChange={(e) => setTargetRole(e.target.value)}
-                  placeholder="e.g. Senior React Developer, Product Manager"
-                  required
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
-                />
+                <div className="relative">
+                  {aiRoles.length > 0 ? (
+                    <select
+                      value={targetRole}
+                      onChange={(e) => setTargetRole(e.target.value)}
+                      required
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
+                    >
+                      <option value="">Select target role</option>
+                      {aiRoles.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                      <option value="custom">-- Type Custom Role --</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={targetRole}
+                      onChange={(e) => setTargetRole(e.target.value)}
+                      placeholder="e.g. Frontend React Developer"
+                      required
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                    />
+                  )}
+                </div>
+
+                {targetRole === "custom" && (
+                  <input
+                    type="text"
+                    value=""
+                    onChange={(e) => setTargetRole(e.target.value)}
+                    placeholder="Type custom role..."
+                    className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                  />
+                )}
               </div>
 
+              {/* Target Country */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-rose-400" />
+                  Target Country / Region <span className="text-red-400">*</span>
+                </label>
+                <select
+                  value={targetCountry}
+                  onChange={(e) => setTargetCountry(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
+                >
+                  <option value="">Select target country</option>
+                  {countryOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Recommended roles */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Code className="h-4 w-4 text-cyan-400" />
-                  What skills do you want to work with?{" "}
-                  <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+                  <Sparkles className="h-4 w-4 text-sky-400" />
+                  Recommended Roles
                 </label>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {aiRoles.map((role) => (
+                    <span
+                      key={role}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-medium text-sky-300"
+                    >
+                      {role}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRole(role)}
+                        className="hover:text-red-400 transition-colors ml-0.5"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={roleInput}
+                    onChange={(e) => setRoleInput(e.target.value)}
+                    placeholder="Add suggested role..."
+                    className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-sky-500"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddRole(roleInput);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddRole(roleInput)}
+                    className="rounded-xl bg-secondary px-3.5 py-2 text-xs font-semibold hover:bg-secondary/80"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
 
-                {targetSkills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {targetSkills.map((skill) => {
-                      const IconComp = getSkillIcon(skill);
-                      return (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-medium text-sky-300"
+              {/* Core skills */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Code className="h-4 w-4 text-emerald-400" />
+                  Core Skills
+                </label>
+                <div className="flex flex-wrap gap-2 pt-1 max-h-36 overflow-y-auto">
+                  {aiSkills.map((skill) => {
+                    const IconComp = getSkillIcon(skill);
+                    return (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400"
+                      >
+                        <IconComp className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="hover:text-red-400 transition-colors ml-0.5"
                         >
-                          <IconComp className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
-                          {skill}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSkill(skill)}
-                            className="hover:text-red-400 transition-colors ml-0.5"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-
-                <div className="flex flex-wrap items-center gap-2">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="flex gap-2">
                   <input
                     type="text"
                     value={skillInput}
                     onChange={(e) => setSkillInput(e.target.value)}
-                    onKeyDown={handleSkillKeyDown}
-                    placeholder="Search or type a skill (e.g. React, Python)..."
-                    className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
+                    placeholder="Add more skills..."
+                    className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-sky-500"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddSkill(skillInput);
+                      }
+                    }}
                   />
                   <button
                     type="button"
                     onClick={() => handleAddSkill(skillInput)}
-                    className="flex items-center gap-1 rounded-xl bg-secondary px-4 py-2.5 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                    className="rounded-xl bg-secondary px-3.5 py-2 text-xs font-semibold hover:bg-secondary/80"
                   >
-                    <Plus className="h-4 w-4" />
                     Add
                   </button>
                 </div>
+              </div>
 
-                <div>
-                  <p className="mb-2 text-xs font-medium text-muted-foreground flex items-center justify-between">
-                    <span>
-                      {skillInput.trim()
-                        ? `Matching skills:`
-                        : "Suggested skills:"}
+              {/* Locations */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-cyan-400" />
+                  Preferred Locations / Remote
+                </label>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {aiLocations.map((loc) => (
+                    <span
+                      key={loc}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-300"
+                    >
+                      {loc}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveLocation(loc)}
+                        className="hover:text-red-400 transition-colors ml-0.5"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
                     </span>
-                    <span className="text-[11px] text-slate-500">
-                      Showing {DEVICON_SKILLS.filter((s) => s.name.toLowerCase().includes(skillInput.trim().toLowerCase())).slice(0, 7).length} of at most 7
-                    </span>
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    {DEVICON_SKILLS.filter((s) =>
-                      s.name.toLowerCase().includes(skillInput.trim().toLowerCase())
-                    )
-                      .slice(0, 7)
-                      .map((skillItem) => {
-                        const isSelected = targetSkills.includes(skillItem.name);
-                        const IconComp = skillItem.icon;
-                        return (
-                          <button
-                            key={skillItem.name}
-                            type="button"
-                            onClick={() => toggleSuggestionSkill(skillItem.name)}
-                            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${isSelected
-                              ? "border-sky-500 bg-sky-500 text-slate-900 font-semibold shadow-md shadow-sky-500/20"
-                              : "border-border bg-background/60 text-muted-foreground hover:border-sky-500/50 hover:text-foreground"
-                              }`}
-                          >
-                            <IconComp className={`h-3.5 w-3.5 shrink-0 ${isSelected ? "text-slate-900" : "text-cyan-400"}`} />
-                            {isSelected ? `✓ ${skillItem.name}` : skillItem.name}
-                          </button>
-                        );
-                      })}
-                  </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    placeholder="Add location (e.g. Remote, India)..."
+                    className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-sky-500"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddLocation(locationInput);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddLocation(locationInput)}
+                    className="rounded-xl bg-secondary px-3.5 py-2 text-xs font-semibold hover:bg-secondary/80"
+                  >
+                    Add
+                  </button>
                 </div>
               </div>
 
+              {/* Expected salary */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <IndianRupee className="h-4 w-4 text-emerald-400" />
-                  Expected Salary Range (in ₹){" "}
-                  <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+                  Expected Salary Range (Optional)
                 </label>
-
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                      Minimum Salary
-                    </label>
                     <input
                       type="number"
                       value={targetSalaryMin}
                       onChange={(e) => setTargetSalaryMin(e.target.value)}
-                      placeholder="Min: ₹15,00,000"
-                      min={0}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
+                      placeholder="Minimum (e.g. 800000)"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
                     />
                     {targetSalaryMin && (
                       <p className="mt-1 text-xs text-emerald-400 font-medium">
@@ -993,18 +1029,13 @@ export default function UploadPage() {
                       </p>
                     )}
                   </div>
-
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                      Maximum Salary
-                    </label>
                     <input
                       type="number"
                       value={targetSalaryMax}
                       onChange={(e) => setTargetSalaryMax(e.target.value)}
-                      placeholder="Max: ₹25,00,000"
-                      min={0}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-muted-foreground"
+                      placeholder="Maximum (e.g. 1500000)"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
                     />
                     {targetSalaryMax && (
                       <p className="mt-1 text-xs text-emerald-400 font-medium">
@@ -1015,23 +1046,31 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              <div className="pt-4">
+              {/* Submit Profile */}
+              <div className="pt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="flex-1 rounded-xl border border-border py-3.5 text-base font-semibold hover:bg-secondary/60 transition"
+                >
+                  Back
+                </button>
                 <motion.button
                   type="submit"
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-base font-semibold text-slate-900 transition-all  disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-[2] flex items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-slate-900 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Saving Preferences...
+                      Saving AI Profile...
                     </>
                   ) : (
                     <>
-                      Save Preferences
-                      <CheckCircle2 className="h-5 w-5" />
+                      Confirm & Save Profile
+                      <Check className="h-5 w-5" />
                     </>
                   )}
                 </motion.button>

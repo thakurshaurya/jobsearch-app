@@ -30,6 +30,12 @@ A sleek, modern **Job Application Tracker** built with **Next.js 13**, **React**
 - **Responsive & premium UI**: Dark mode, glass‑morphism cards, micro‑animations.
 - **Zero‑config API**: Built‑in Next.js API routes for CRUD operations.
 - **Progressive loading**: Skeleton loaders while fetching data.
+### 🛠️ AI‑Powered Enhancements
+
+- **Target Country Selection**: Integrated a target‑country dropdown in the AI profile step and removed the manual country selector from the results page. The app now automatically fetches personalized jobs based on the saved country.
+- **City Preference Scoping**: Backend now appends user‑preferred cities (e.g., “Bengaluru”) to JSearch queries, delivering more locally relevant job listings.
+- **Dynamic Loading Messages**: Updated the loading message rotation interval to 4.5 seconds, providing smoother feedback while Gemini processes and ranks jobs.
+- **Match Score Badge Styling**: Refined badge colors and thresholds for clearer visual distinction of high, medium, and low match scores.
 
 ---
 

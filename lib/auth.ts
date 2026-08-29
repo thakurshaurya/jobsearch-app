@@ -20,7 +20,6 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
     return verified.payload as CurrentUser;
   } catch {
-    // expired or tampered token
     return null;
   }
 }

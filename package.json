@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@google/genai": "^2.19.0",
     "@types/nodemailer": "^6.4.24",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

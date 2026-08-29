@@ -24,6 +24,11 @@ const jobTargetSchema = new mongoose.Schema(
     targetSalaryMax: {
       type: Number,
     },
+    targetCountry: {
+      type: String,
+      required: [true, "Please provide a target country"],
+      trim: true,
+    },
   },
   {
     timestamps: true,

@@ -70,7 +70,12 @@ export async function saveUserResume(
   aboutSelf?: string,
   parsedSkills?: string[],
   experience?: string,
-  education?: string
+  education?: string,
+  resumeText?: string,
+  roles?: string[],
+  seniority?: string,
+  locations?: string[],
+  searchQueries?: string[]
 ) {
   try {
     await connectDB();
@@ -106,6 +111,11 @@ export async function saveUserResume(
       }
       if (experience !== undefined) resumeDoc.experience = experience;
       if (education !== undefined) resumeDoc.education = education;
+      if (resumeText !== undefined) resumeDoc.resumeText = resumeText;
+      if (roles !== undefined) resumeDoc.roles = roles;
+      if (seniority !== undefined) resumeDoc.seniority = seniority;
+      if (locations !== undefined) resumeDoc.locations = locations;
+      if (searchQueries !== undefined) resumeDoc.searchQueries = searchQueries;
       resumeDoc.sourceType = finalSourceType;
       resumeDoc.lastUpdated = new Date();
     } else {
@@ -116,6 +126,11 @@ export async function saveUserResume(
         parsedSkills: parsedSkills || [],
         experience: experience || undefined,
         education: education || undefined,
+        resumeText: resumeText || null,
+        roles: roles || [],
+        seniority: seniority || null,
+        locations: locations || [],
+        searchQueries: searchQueries || [],
         sourceType: finalSourceType,
         lastUpdated: new Date(),
       });
@@ -139,7 +154,8 @@ export async function saveJobTarget(
   targetRole: string,
   targetSkills?: string[],
   targetSalaryMin?: number,
-  targetSalaryMax?: number
+  targetSalaryMax?: number,
+  targetCountry?: string
 ) {
   try {
     await connectDB();
@@ -153,6 +169,10 @@ export async function saveJobTarget(
       return { error: "targetRole is required" };
     }
 
+    if (!targetCountry || !targetCountry.trim()) {
+      return { error: "targetCountry is required" };
+    }
+
     let targetDoc = await JobTarget.findOne({ userId: currentUser.userId });
 
     if (targetDoc) {
@@ -162,6 +182,8 @@ export async function saveJobTarget(
         targetDoc.targetSalaryMin = targetSalaryMin;
       if (targetSalaryMax !== undefined)
         targetDoc.targetSalaryMax = targetSalaryMax;
+      if (targetCountry !== undefined)
+        targetDoc.targetCountry = targetCountry.trim();
     } else {
       targetDoc = new JobTarget({
         userId: currentUser.userId,
@@ -169,6 +191,7 @@ export async function saveJobTarget(
         targetSkills: targetSkills || [],
         targetSalaryMin,
         targetSalaryMax,
+        targetCountry: targetCountry.trim(),
       });
     }
 
