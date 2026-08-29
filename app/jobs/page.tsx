@@ -171,7 +171,7 @@ export default function JobsPage() {
                 <form
                     onSubmit={handleSearch}
                     autoComplete="off"
-                    className="flex flex-col gap-10 rounded-[2rem] border border-white/10 bg-white/80 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-950/75 sm:p-12"
+                    className="flex flex-col gap-10 rounded-[2rem] border border-white/10 bg-white/80 p-4 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-950/75 sm:p-12"
                 >
 
                     {/* Heading */}
@@ -190,7 +190,7 @@ export default function JobsPage() {
                     {/* Search Box */}
                     <div className="flex flex-col gap-6 rounded-[1.8rem] border border-slate-200/80 bg-slate-950/5 p-6 shadow-inner dark:border-slate-800/70 dark:bg-slate-950/40">
 
-                        <div className="relative overflow-hidden rounded-3xl bg-white/90 p-7 shadow-lg dark:bg-slate-950/80">
+                        <div className="relative rounded-3xl bg-white/90 p-7 shadow-lg dark:bg-slate-950/80">
 
                             {/* Search Fields */}
                             <div className="mt-4 flex flex-wrap gap-4">
