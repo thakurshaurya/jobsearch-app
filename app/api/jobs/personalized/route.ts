@@ -3,7 +3,7 @@ import { connectDB } from "@/dbconfig/dbconfig";
 import { getCurrentUser } from "@/lib/auth";
 import Resume from "@/models/resumeModel";
 import JobTarget from "@/models/jobTargetModel";
-import { matchJobs } from "@/lib/ai/gemini";
+import { matchJobs } from "@/lib/ai/groq";
 import { JSearchJob, MatchedJob } from "@/types/jobs";
 
 interface RawJSearchJob {
@@ -26,8 +26,8 @@ interface RawJSearchJob {
   job_is_remote?: boolean;
 }
 
-function formatPostedDate(postedAt: any, datetimeUtc: any): string {
-  if (datetimeUtc) {
+function formatPostedDate(postedAt: unknown, datetimeUtc: unknown): string {
+  if (typeof datetimeUtc === "string" || typeof datetimeUtc === "number" || datetimeUtc instanceof Date) {
     const d = new Date(datetimeUtc);
     if (!isNaN(d.getTime())) {
       return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
@@ -52,8 +52,10 @@ function formatPostedDate(postedAt: any, datetimeUtc: any): string {
       date = new Date(postedAt * 1000);
     } else if (typeof postedAt === "string" && /^\d+$/.test(postedAt)) {
       date = new Date(parseInt(postedAt) * 1000);
-    } else {
+    } else if (typeof postedAt === "string" || postedAt instanceof Date) {
       date = new Date(postedAt);
+    } else {
+      return "Recently";
     }
 
     if (isNaN(date.getTime())) {
@@ -266,11 +268,10 @@ export async function GET(request: NextRequest) {
     let matchedJobs: MatchedJob[] = [];
     let aiMatched = false;
 
-
     try {
-      if (jobsToRank.length > 0 && process.env.GEMINI_API_KEY) {
-        console.log("Calling Gemini to rank top", jobsToRank.length, "jobs...");
-        const rankings = await matchJobs(candidateProfile, jobsToRank);
+      if (jobsToRank.length > 0) {
+        console.log("Ranking top", jobsToRank.length, "jobs deterministically using candidate profile...");
+        const rankings = matchJobs(candidateProfile, jobsToRank);
 
         const rankingsMap = new Map(rankings.map((r) => [r.jobId, r]));
 
@@ -296,14 +297,14 @@ export async function GET(request: NextRequest) {
           matchReason: null,
         }));
       }
-    } catch (geminiError) {
-      console.error("Gemini job matching failed. Falling back to unranked JSearch jobs:", geminiError);
+    } catch (matchingError) {
+      console.error("Job matching failed. Falling back to unranked JSearch jobs:", matchingError);
       matchedJobs = jobsToRank.map((job) => ({
         ...job,
         matchScore: null,
         matchingSkills: [],
         missingSkills: [],
-        matchReason: "AI ranking is temporarily unavailable.",
+        matchReason: "Matching calculation failed.",
       }));
     }
 

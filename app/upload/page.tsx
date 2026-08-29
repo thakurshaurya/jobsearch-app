@@ -29,6 +29,7 @@ import {
 } from "@/app/action";
 import { getSkillIcon } from "@/lib/devicons";
 import { countryOptions } from "@/lib/locations";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -88,7 +89,7 @@ export default function UploadPage() {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [loadingStage, setLoadingStage] = useState<string>("");
 
-  // AI Profile data (returned by Gemini or loaded from db)
+  // AI Profile data (returned by Groq or loaded from db)
   const [parsedText, setParsedText] = useState<string>("");
   const [candidateName, setCandidateName] = useState<string>("");
   const [experienceYears, setExperienceYears] = useState<string>("");
@@ -255,7 +256,7 @@ export default function UploadPage() {
     setFileError("");
   };
 
-  // Analyze Resume with Gemini via backend API route
+  // Analyze Resume with AI via backend API route
   const handleAnalyzeResume = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -334,7 +335,7 @@ export default function UploadPage() {
       const analyzeData = await analyzeResponse.json();
 
       if (!analyzeResponse.ok) {
-        throw new Error(analyzeData?.error || "Gemini failed to analyze the resume");
+        throw new Error(analyzeData?.error || "AI failed to analyze the resume");
       }
 
       const { analysis } = analyzeData;
@@ -545,7 +546,7 @@ export default function UploadPage() {
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               {step === 1
                 ? "Upload your resume or tell us about your experience to generate your AI profile."
-                : "Verify the information Gemini extracted from your resume."}
+                : "Verify the information AI extracted from your resume."}
             </p>
           </div>
 
@@ -721,7 +722,7 @@ export default function UploadPage() {
                   whileTap={{ scale: 0.98 }}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3.5 text-base font-semibold text-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Analyze Resume with Gemini
+                  Analyze Resume with AI
                   <ArrowRight className="h-5 w-5" />
                 </motion.button>
               </div>
@@ -756,17 +757,18 @@ export default function UploadPage() {
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Seniority Level
                   </label>
-                  <select
+                  <CustomSelect
                     value={seniority}
-                    onChange={(e) => setSeniority(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
-                  >
-                    <option value="Entry Level">Entry Level</option>
-                    <option value="Mid Level">Mid Level</option>
-                    <option value="Senior">Senior</option>
-                    <option value="Lead">Lead / Manager</option>
-                    <option value="Executive">Executive</option>
-                  </select>
+                    onChange={setSeniority}
+                    options={[
+                      { value: "Entry Level", label: "Entry Level" },
+                      { value: "Mid Level", label: "Mid Level" },
+                      { value: "Senior", label: "Senior" },
+                      { value: "Lead", label: "Lead / Manager" },
+                      { value: "Executive", label: "Executive" }
+                    ]}
+                    placeholder="Select Seniority Level"
+                  />
                 </div>
 
                 <div className="space-y-1">
@@ -805,20 +807,15 @@ export default function UploadPage() {
                 </label>
                 <div className="relative">
                   {aiRoles.length > 0 ? (
-                    <select
+                    <CustomSelect
                       value={targetRole}
-                      onChange={(e) => setTargetRole(e.target.value)}
-                      required
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
-                    >
-                      <option value="">Select target role</option>
-                      {aiRoles.map((role) => (
-                        <option key={role} value={role}>
-                          {role}
-                        </option>
-                      ))}
-                      <option value="custom">-- Type Custom Role --</option>
-                    </select>
+                      onChange={setTargetRole}
+                      options={[
+                        ...aiRoles.map((role) => ({ value: role, label: role })),
+                        { value: "custom", label: "-- Type Custom Role --" }
+                      ]}
+                      placeholder="Select target role"
+                    />
                   ) : (
                     <input
                       type="text"
@@ -848,19 +845,12 @@ export default function UploadPage() {
                   <MapPin className="h-4 w-4 text-rose-400" />
                   Target Country / Region <span className="text-red-400">*</span>
                 </label>
-                <select
+                <CustomSelect
                   value={targetCountry}
-                  onChange={(e) => setTargetCountry(e.target.value)}
-                  required
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
-                >
-                  <option value="">Select target country</option>
-                  {countryOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setTargetCountry}
+                  options={countryOptions}
+                  placeholder="Select target country"
+                />
               </div>
 
               {/* Recommended roles */}

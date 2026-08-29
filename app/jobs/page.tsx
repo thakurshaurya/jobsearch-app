@@ -12,6 +12,7 @@ import {
     countryOptions,
     cityOptions,
 } from "@/lib/locations";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 const timeOptions = [
     {
@@ -220,40 +221,16 @@ export default function JobsPage() {
                                         Country
                                     </span>
 
-                                    <div className="relative">
-
-                                        <select
-                                            value={country}
-                                            onChange={(event) => {
-                                                setCountry(
-                                                    event.target.value
-                                                );
-
-                                                setCity("");
-                                            }}
-                                            className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                                        >
-
-                                            <option value="">
-                                                Select a country
-                                            </option>
-
-                                            {countryOptions.map(
-                                                (option) => (
-                                                    <option
-                                                        key={option.value}
-                                                        value={option.value}
-                                                    >
-                                                        {option.label}
-                                                    </option>
-                                                )
-                                            )}
-
-                                        </select>
-
-                                        <MapPin className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-
-                                    </div>
+                                    <CustomSelect
+                                        value={country}
+                                        onChange={(val) => {
+                                            setCountry(val);
+                                            setCity("");
+                                        }}
+                                        options={countryOptions}
+                                        placeholder="Select a country"
+                                        icon={<MapPin className="h-5 w-5 text-slate-400" />}
+                                    />
 
                                 </label>
 
@@ -264,77 +241,31 @@ export default function JobsPage() {
                                         City
                                     </span>
 
-                                    <div className="relative">
-
-                                        <select
-                                            disabled={country === ""}
-                                            value={city}
-                                            onChange={(event) =>
-                                                setCity(event.target.value)
-                                            }
-                                            className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:disabled:bg-slate-900/40"
-                                        >
-
-                                            <option value="">
-                                                All Cities
-                                            </option>
-
-                                            {cities.map(
-                                                (option) => (
-                                                    <option
-                                                        key={option.value}
-                                                        value={option.value}
-                                                    >
-                                                        {option.label}
-                                                    </option>
-                                                )
-                                            )}
-
-                                        </select>
-
-                                        <MapPin className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-
-                                    </div>
+                                    <CustomSelect
+                                        disabled={country === ""}
+                                        value={city}
+                                        onChange={setCity}
+                                        options={cities}
+                                        placeholder="All Cities"
+                                        icon={<MapPin className="h-5 w-5 text-slate-400" />}
+                                    />
 
                                 </label>
 
                                 {/* Posted */}
-                                <label className="flex w-full flex-col gap-2  lg:flex-1">
+                                <label className="flex w-full flex-col gap-2 lg:flex-1">
 
                                     <span className="text-sm ml-1.25 font-medium text-slate-700 dark:text-slate-200">
                                         When was it posted?
                                     </span>
 
-                                    <div className="relative">
-
-                                        <select
-                                            value={posted}
-                                            onChange={(event) =>
-                                                setPosted(event.target.value)
-                                            }
-                                            className="h-14 w-full rounded-xl border border-slate-300/80 bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                                        >
-
-                                            <option value="">
-                                                Any time
-                                            </option>
-
-                                            {timeOptions.map(
-                                                (option) => (
-                                                    <option
-                                                        key={option.value}
-                                                        value={option.value}
-                                                    >
-                                                        {option.label}
-                                                    </option>
-                                                )
-                                            )}
-
-                                        </select>
-
-                                        <Clock3 className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-
-                                    </div>
+                                    <CustomSelect
+                                        value={posted}
+                                        onChange={setPosted}
+                                        options={timeOptions}
+                                        placeholder="Any time"
+                                        icon={<Clock3 className="h-5 w-5 text-slate-400" />}
+                                    />
 
                                 </label>
 

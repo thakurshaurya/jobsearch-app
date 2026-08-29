@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 
 import { getSkillIcon } from "@/lib/devicons";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 export type JobApplicationItem = {
   _id: string;
@@ -624,36 +625,29 @@ export default function ApplicationsPage() {
                 ))}
               </div>
 
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) =>
-                    setSortBy(
-                      e.target.value as
-                      | "recent"
-                      | "score_desc"
-                      | "score_asc"
-                      | "company"
-                    )
-                  }
-                  className="h-10 appearance-none rounded-xl border border-border bg-background px-3.5 pr-8 text-xs font-medium text-foreground outline-none transition-colors duration-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                >
-                  <option value="recent">
-                    Most Recent
-                  </option>
-                  <option value="score_desc">
-                    Highest Score
-                  </option>
-                  <option value="score_asc">
-                    Lowest Score
-                  </option>
-                  <option value="company">
-                    Company (A-Z)
-                  </option>
-                </select>
-
-                <ArrowUpDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              </div>
+              <CustomSelect
+                value={sortBy}
+                onChange={(val) =>
+                  setSortBy(
+                    val as
+                    | "recent"
+                    | "score_desc"
+                    | "score_asc"
+                    | "company"
+                  )
+                }
+                options={[
+                  { value: "recent", label: "Most Recent" },
+                  { value: "score_desc", label: "Highest Score" },
+                  { value: "score_asc", label: "Lowest Score" },
+                  { value: "company", label: "Company (A-Z)" }
+                ]}
+                placeholder="Sort by"
+                className="w-40 text-xs font-medium"
+                triggerClassName="flex h-10 w-full items-center justify-between rounded-xl border border-border bg-background px-3.5 text-xs font-medium text-foreground outline-none transition-colors duration-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 cursor-pointer"
+                icon={<ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />}
+                hideChevron={true}
+              />
 
               <div className="flex items-center rounded-xl border border-border bg-background p-1">
 
@@ -865,51 +859,26 @@ export default function ApplicationsPage() {
                           )}
                         </span>
 
-                        <div className="relative">
-                          <select
+                          <CustomSelect
                             value={app.status}
-                            disabled={
-                              updatingId === app._id
-                            }
-                            onChange={(e) =>
+                            disabled={updatingId === app._id}
+                            onChange={(val) =>
                               handleStatusChange(
                                 app._id,
-                                e.target.value as StatusType
+                                val as StatusType
                               )
                             }
-                            className={`cursor-pointer appearance-none rounded-full border px-3 py-1 pr-6 text-xs font-semibold capitalize outline-none transition-colors duration-150 ${statusConfig.style}`}
-                          >
-                            <option
-                              value="applied"
-                              className="bg-popover text-foreground"
-                            >
-                              Applied
-                            </option>
-
-                            <option
-                              value="interviewing"
-                              className="bg-popover text-foreground"
-                            >
-                              Interviewing
-                            </option>
-
-                            <option
-                              value="accepted"
-                              className="bg-popover text-foreground"
-                            >
-                              Accepted
-                            </option>
-
-                            <option
-                              value="rejected"
-                              className="bg-popover text-foreground"
-                            >
-                              Rejected
-                            </option>
-                          </select>
-
-                          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 opacity-70" />
-                        </div>
+                            options={[
+                              { value: "applied", label: "Applied" },
+                              { value: "interviewing", label: "Interviewing" },
+                              { value: "accepted", label: "Accepted" },
+                              { value: "rejected", label: "Rejected" }
+                            ]}
+                            placeholder="Status"
+                            className="w-32 text-xs font-semibold capitalize"
+                            triggerClassName={`flex h-7 w-full items-center justify-between rounded-full border px-2.5 text-xs font-semibold capitalize outline-none transition-colors duration-150 cursor-pointer ${statusConfig.style}`}
+                            optionsClassName="bg-popover text-foreground border-border"
+                          />
                       </div>
 
                       <div className="mt-4">
@@ -1183,47 +1152,26 @@ export default function ApplicationsPage() {
                           </td>
 
                           <td className="px-4 py-4">
-                            <select
+                            <CustomSelect
                               value={app.status}
-                              disabled={
-                                updatingId === app._id
-                              }
-                              onChange={(e) =>
+                              disabled={updatingId === app._id}
+                              onChange={(val) =>
                                 handleStatusChange(
                                   app._id,
-                                  e.target.value as StatusType
+                                  val as StatusType
                                 )
                               }
-                              className={`cursor-pointer rounded-full border px-2.5 py-1 text-xs font-semibold capitalize outline-none ${statusConfig.style}`}
-                            >
-                              <option
-                                value="applied"
-                                className="bg-popover text-foreground"
-                              >
-                                Applied
-                              </option>
-
-                              <option
-                                value="interviewing"
-                                className="bg-popover text-foreground"
-                              >
-                                Interviewing
-                              </option>
-
-                              <option
-                                value="accepted"
-                                className="bg-popover text-foreground"
-                              >
-                                Accepted
-                              </option>
-
-                              <option
-                                value="rejected"
-                                className="bg-popover text-foreground"
-                              >
-                                Rejected
-                              </option>
-                            </select>
+                              options={[
+                                { value: "applied", label: "Applied" },
+                                { value: "interviewing", label: "Interviewing" },
+                                { value: "accepted", label: "Accepted" },
+                                { value: "rejected", label: "Rejected" }
+                              ]}
+                              placeholder="Status"
+                              className="w-32 text-xs font-semibold capitalize"
+                              triggerClassName={`flex h-7 w-full items-center justify-between rounded-full border px-2.5 text-xs font-semibold capitalize outline-none transition-colors duration-150 cursor-pointer ${statusConfig.style}`}
+                              optionsClassName="bg-popover text-foreground border-border"
+                            />
                           </td>
 
                           <td className="px-4 py-4">

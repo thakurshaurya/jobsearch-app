@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { analyzeResume } from "@/lib/ai/gemini";
+import { analyzeResume } from "@/lib/ai/groq";
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Calling Gemini to analyze resume for user:", user.userId);
+    console.log("Calling Groq to analyze resume for user:", user.userId);
     const analysis = await analyzeResume(resumeText, aboutSelf || "");
 
 
