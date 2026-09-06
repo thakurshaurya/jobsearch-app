@@ -17,11 +17,15 @@ import { CustomSelect } from "@/components/ui/custom-select";
 const timeOptions = [
     {
         value: "week",
-        label: "Last week",
+        label: "Last week (7 days)",
+    },
+    {
+        value: "2weeks",
+        label: "Last 2 weeks (14 days)",
     },
     {
         value: "month",
-        label: "Last month",
+        label: "Last month (30 days)",
     },
     {
         value: "any",

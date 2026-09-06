@@ -11,6 +11,8 @@ import JobApplication from "@/models/jobApplicationModel";
 import { getCurrentUser } from "@/lib/auth";
 import bcryptjs from "bcryptjs";
 import { SignJWT } from "jose";
+import crypto from "crypto";
+import { sendMail } from "@/helpers/mailer";
 
 const MAX_AGE = 7 * 24 * 60 * 60;
 
@@ -329,3 +331,83 @@ export async function updateApplicationStatus(
   }
 }
 
+export async function requestPasswordReset(email: string) {
+  try {
+    await connectDB();
+
+    if (!email || !email.trim()) {
+      return { error: "Please enter your email address" };
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      return {
+        success: true,
+        message: "If an account exists with that email, a password reset link has been sent.",
+      };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    user.forgotPasswordToken = resetToken;
+    user.forgotPasswordTokenExpiry = resetTokenExpiry;
+    await user.save();
+
+    await sendMail({
+      email: cleanEmail,
+      emailType: "RESET",
+      userId: user._id,
+      token: resetToken,
+    });
+
+    return {
+      success: true,
+      message: "A password reset link has been sent to your email address.",
+    };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return { error: err.message || "Failed to send reset link. Please try again." };
+  }
+}
+
+export async function resetPasswordWithToken(token: string, newPassword: string) {
+  try {
+    await connectDB();
+
+    if (!token || !token.trim()) {
+      return { error: "Invalid or missing reset token." };
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      return { error: "Password must be at least 6 characters long." };
+    }
+
+    const user = await User.findOne({
+      forgotPasswordToken: token,
+      forgotPasswordTokenExpiry: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return { error: "This password reset link is invalid or has expired. Please request a new one." };
+    }
+
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.forgotPasswordToken = undefined;
+    user.forgotPasswordTokenExpiry = undefined;
+    await user.save();
+
+    return {
+      success: true,
+      message: "Password reset successful! You can now log in with your new password.",
+    };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return { error: err.message || "Failed to reset password. Please try again." };
+  }
+}

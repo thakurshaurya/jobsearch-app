@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isWithinTwoWeeks } from "@/app/api/jobs/personalized/route";
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,8 +26,14 @@ export async function GET(request: NextRequest) {
 
     apiUrl.searchParams.set("query", searchQuery);
 
+    const isTwoWeeksFilter = datePosted === "2weeks" || datePosted === "14days";
+
     if (datePosted && datePosted !== "any") {
-      apiUrl.searchParams.set("date_posted", datePosted);
+      if (isTwoWeeksFilter) {
+        apiUrl.searchParams.set("date_posted", "month");
+      } else {
+        apiUrl.searchParams.set("date_posted", datePosted);
+      }
     }
 
     const countryParam = searchParams.get("countryCode") || searchParams.get("country") || "in";
@@ -94,9 +101,14 @@ export async function GET(request: NextRequest) {
       rawJobs = data.data.jobs;
     }
 
-    console.log("Number of jobs:", rawJobs.length);
+    let filteredRawJobs = rawJobs;
+    if (isTwoWeeksFilter) {
+      filteredRawJobs = rawJobs.filter((job: any) =>
+        isWithinTwoWeeks(job.job_posted_at, job.job_posted_at_datetime_utc, 15)
+      );
+    }
 
-    const jobs = rawJobs.map((job: any) => ({
+    const jobs = filteredRawJobs.map((job: any) => ({
       id: job.job_id,
       title: job.job_title,
       company: job.employer_name,

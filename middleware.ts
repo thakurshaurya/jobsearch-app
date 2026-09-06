@@ -23,8 +23,10 @@ export async function middleware(request: NextRequest) {
   );
 
 
-  const publicAuthRoutes = ["/signup", "/login"];
-  const isPublicAuthRoute = publicAuthRoutes.includes(path);
+  const publicAuthRoutes = ["/signup", "/login", "/forgot-password", "/reset-password"];
+  const isPublicAuthRoute = publicAuthRoutes.some((route) =>
+    path === route || path.startsWith(`${route}/`)
+  );
 
 
   if (isProtectedRoute && !isAuthenticated) {

@@ -26,10 +26,90 @@ interface RawJSearchJob {
   job_is_remote?: boolean;
 }
 
+export function isWithinTwoWeeks(
+  postedAt: unknown,
+  datetimeUtc: unknown,
+  maxDays: number = 15
+): boolean {
+  const now = Date.now();
+  // Allow up to maxDays plus 12 hours buffer for timezone/execution margins
+  const maxMs = (maxDays + 0.5) * 24 * 60 * 60 * 1000;
+
+  // 1. Check ISO/datetimeUtc first
+  if (datetimeUtc) {
+    const d = new Date(datetimeUtc as any);
+    if (!isNaN(d.getTime())) {
+      const diff = now - d.getTime();
+      return diff <= maxMs;
+    }
+  }
+
+  // 2. Check numeric timestamp in postedAt
+  if (typeof postedAt === "number") {
+    const ms = postedAt > 1e11 ? postedAt : postedAt * 1000;
+    return (now - ms) <= maxMs;
+  }
+  if (typeof postedAt === "string" && /^\d+$/.test(postedAt)) {
+    const num = parseInt(postedAt, 10);
+    const ms = num > 1e11 ? num : num * 1000;
+    return (now - ms) <= maxMs;
+  }
+
+  // 3. Check ISO string format in postedAt
+  if (
+    typeof postedAt === "string" &&
+    postedAt.includes("-") &&
+    !isNaN(Date.parse(postedAt))
+  ) {
+    const ms = Date.parse(postedAt);
+    return (now - ms) <= maxMs;
+  }
+
+  // 4. Check relative time text
+  if (typeof postedAt === "string") {
+    const lower = postedAt.toLowerCase().trim();
+
+    if (lower.includes("month") || lower.includes("year")) {
+      return false;
+    }
+
+    const weekMatch = lower.match(/(\d+)\s*week/);
+    if (weekMatch) {
+      const weeks = parseInt(weekMatch[1], 10);
+      return weeks <= 2; // 1 week or 2 weeks max (<= 14 days)
+    }
+
+    const dayMatch = lower.match(/(\d+)\s*day/);
+    if (dayMatch) {
+      const days = parseInt(dayMatch[1], 10);
+      return days <= maxDays;
+    }
+
+    if (
+      lower.includes("hour") ||
+      lower.includes("minute") ||
+      lower.includes("second") ||
+      lower.includes("today") ||
+      lower.includes("yesterday") ||
+      lower.includes("just now") ||
+      lower.includes("recently")
+    ) {
+      return true;
+    }
+  }
+
+  return true;
+}
+
 function formatPostedDate(postedAt: unknown, datetimeUtc: unknown): string {
   if (typeof datetimeUtc === "string" || typeof datetimeUtc === "number" || datetimeUtc instanceof Date) {
     const d = new Date(datetimeUtc);
     if (!isNaN(d.getTime())) {
+      const diffDays = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays <= 0) return "Today";
+      if (diffDays === 1) return "Yesterday";
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays <= 14) return `${Math.floor(diffDays / 7)}w ago`;
       return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
     }
   }
@@ -61,6 +141,12 @@ function formatPostedDate(postedAt: unknown, datetimeUtc: unknown): string {
     if (isNaN(date.getTime())) {
       return "Recently";
     }
+
+    const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays <= 14) return `${Math.floor(diffDays / 7)}w ago`;
 
     return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
   } catch {
@@ -231,6 +317,11 @@ export async function GET(request: NextRequest) {
 
 
       if (!title || !applyUrl) {
+        continue;
+      }
+
+      // Force job listings to only those uploaded within 2 weeks (14-15 days max)
+      if (!isWithinTwoWeeks(job.job_posted_at, job.job_posted_at_datetime_utc, 15)) {
         continue;
       }
 
