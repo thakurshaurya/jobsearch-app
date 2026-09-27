@@ -61,7 +61,19 @@ export async function loginUser(email: string, password: string) {
 }
 
 export async function logoutUser() {
+  try {
+    const { signOut } = await import("@/auth");
+    await signOut({ redirect: false });
+  } catch {
+    // If Auth.js was not logged in, ignore
+  }
+
   (await cookies()).delete("token");
+  (await cookies()).delete("authjs.session-token");
+  (await cookies()).delete("__Secure-authjs.session-token");
+  (await cookies()).delete("next-auth.session-token");
+  (await cookies()).delete("__Secure-next-auth.session-token");
+
   revalidatePath("/", "layout");
   redirect("/login");
 }

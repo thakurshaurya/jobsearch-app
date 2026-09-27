@@ -70,10 +70,12 @@ const Header = async () => {
                                     role="button"
                                     className="avatar cursor-pointer transition-transform hover:scale-105"
                                 >
-                                    <div className="w-10 rounded-full ring ring-primary ring-offset-2 ring-offset-background">
+                                    <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-2 ring-offset-background overflow-hidden flex items-center justify-center bg-muted">
                                         <img
                                             alt={user.username}
-                                            src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.username)}`}
+                                            src={user.image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.username)}`}
+                                            className="h-full w-full object-cover"
+                                            referrerPolicy="no-referrer"
                                         />
                                     </div>
                                 </div>

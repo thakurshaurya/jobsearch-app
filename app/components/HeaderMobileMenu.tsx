@@ -8,6 +8,7 @@ import { logoutUser } from "@/app/action";
 type UserType = {
   username: string;
   email: string;
+  image?: string | null;
 } | null;
 
 interface HeaderMobileMenuProps {
@@ -87,11 +88,12 @@ export default function HeaderMobileMenu({ user }: HeaderMobileMenuProps) {
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 rounded-full ring ring-primary ring-offset-2 ring-offset-background overflow-hidden">
+                  <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-2 ring-offset-background overflow-hidden flex items-center justify-center bg-muted">
                     <img
                       alt={user.username}
-                      src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.username)}`}
-                      className="h-10 w-10"
+                      src={user.image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.username)}`}
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
                     />
                   </div>
                   <div className="min-w-0">

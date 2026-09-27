@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { User, Mail, Lock } from "lucide-react";
 import { useState } from "react";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -25,9 +26,9 @@ export default function SignupPage() {
       const response = await fetch("/api/users/signup", {
         method: "POST",
         headers: {
-          "content-type": "application/json"
+          "content-type": "application/json",
         },
-        body: JSON.stringify({username, email, password})
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
@@ -46,7 +47,6 @@ export default function SignupPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-10">
-
       <motion.form
         onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -67,16 +67,13 @@ export default function SignupPage() {
           }}
           className="rounded-3xl border border-border bg-card/80 p-8 shadow-2xl backdrop-blur-xl"
         >
-
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full bg-red-400" />
             <span className="h-3 w-3 rounded-full bg-yellow-400" />
             <span className="h-3 w-3 rounded-full bg-green-400" />
           </div>
 
-
           <div className="mt-6 text-center">
-
             <h1 className="hero-gradient text-3xl font-extrabold">
               Create Account
             </h1>
@@ -84,30 +81,24 @@ export default function SignupPage() {
             <p className="mt-3 text-sm text-muted-foreground">
               Start your AI-powered job search journey.
             </p>
-
           </div>
 
-
           <div className="mt-8 space-y-5">
-
-
             <div>
               <label className="mb-2 block text-sm font-medium text-foreground">
                 Username
               </label>
 
               <div className="flex items-center rounded-xl border border-border bg-background px-4 transition-all duration-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
-
                 <User className="h-5 w-5 text-muted-foreground" />
-
                 <input
                   type="text"
                   id="username"
                   name="username"
                   placeholder="Enter Username"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
+                  required
                 />
-
               </div>
             </div>
 
@@ -117,21 +108,17 @@ export default function SignupPage() {
               </label>
 
               <div className="flex items-center rounded-xl border border-border bg-background px-4 transition-all duration-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
-
                 <Mail className="h-5 w-5 text-muted-foreground" />
-
                 <input
                   type="email"
                   id="email"
                   name="email"
                   placeholder="example@email.com"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
+                  required
                 />
-
               </div>
             </div>
-
-
 
             <div>
               <label className="mb-2 block text-sm font-medium text-foreground">
@@ -139,17 +126,15 @@ export default function SignupPage() {
               </label>
 
               <div className="flex items-center rounded-xl border border-border bg-background px-4 transition-all duration-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
-
                 <Lock className="h-5 w-5 text-muted-foreground" />
-
                 <input
                   type="password"
                   id="password"
                   name="password"
                   placeholder="••••••••"
                   className="w-full bg-transparent px-3 py-3 text-foreground outline-none placeholder:text-muted-foreground"
+                  required
                 />
-
               </div>
             </div>
 
@@ -168,11 +153,19 @@ export default function SignupPage() {
               whileTap={{
                 scale: 0.97,
               }}
-              className="mt-3 w-full rounded-xl bg-blue-500 py-3 font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-3 w-full rounded-xl bg-blue-500 py-3 font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? "Creating Account..." : "Create Account"}
             </motion.button>
 
+            <div className="relative my-6 flex items-center justify-center">
+              <div className="w-full border-t border-border" />
+              <span className="absolute bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">
+                OR
+              </span>
+            </div>
+
+            <SocialAuthButtons callbackUrl="/dashboard" />
 
             <p className="pt-2 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
@@ -183,9 +176,7 @@ export default function SignupPage() {
                 Login
               </Link>
             </p>
-
           </div>
-
         </motion.section>
       </motion.form>
     </div>
