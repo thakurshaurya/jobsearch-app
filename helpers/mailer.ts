@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { MailtrapTransport } from "mailtrap";
+
 
 export const sendMail = async ({
     email,
@@ -68,9 +68,9 @@ export const sendMail = async ({
 
         try {
             const transport = nodemailer.createTransport(
-                MailtrapTransport({
-                    token: TOKEN,
-                })
+                // MailtrapTransport({
+                //     token: TOKEN,
+                // })
             );
 
             const mailResponse = await transport.sendMail({
