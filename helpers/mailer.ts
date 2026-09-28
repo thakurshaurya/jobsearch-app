@@ -67,11 +67,14 @@ export const sendMail = async ({
         }
 
         try {
-            const transport = nodemailer.createTransport(
-                // MailtrapTransport({
-                //     token: TOKEN,
-                // })
-            );
+            const transport = nodemailer.createTransport({
+                host: process.env.MAILTRAP_HOST || "live.smtp.mailtrap.io",
+                port: Number(process.env.MAILTRAP_PORT) || 587,
+                auth: {
+                    user: process.env.MAILTRAP_USER || "api",
+                    pass: TOKEN,
+                },
+            });
 
             const mailResponse = await transport.sendMail({
                 from: {
